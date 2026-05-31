@@ -52,8 +52,8 @@ const translations = {
     xhsLabel: "Xiaohongshu",
     xhsTitle: "View author updates",
     xhsText: "Replace this with your personal profile link when ready.",
-    githubTitle: "Open-source link coming soon",
-    githubText: "Add the repository URL later.",
+    githubTitle: "Open-source repository",
+    githubText: "View the source code and releases on GitHub.",
   },
   zh: {
     pageTitle: "UniGraph - 学生友好的学术绘图工具",
@@ -104,8 +104,8 @@ const translations = {
     xhsLabel: "小红书",
     xhsTitle: "查看作者动态",
     xhsText: "待替换为你的个人主页链接",
-    githubTitle: "开源链接即将开放",
-    githubText: "稍后填入仓库地址",
+    githubTitle: "开源仓库",
+    githubText: "在 GitHub 查看源代码和版本发布。",
   },
   fr: {
     pageTitle: "UniGraph - Outil de tracé académique pour étudiants",
@@ -160,8 +160,8 @@ const translations = {
     xhsLabel: "Xiaohongshu",
     xhsTitle: "Voir les actualités de l'auteur",
     xhsText: "Remplacez ce lien par votre profil personnel lorsque vous serez prêt.",
-    githubTitle: "Lien open source bientôt disponible",
-    githubText: "Ajoutez plus tard l'URL du dépôt.",
+    githubTitle: "Dépôt open source",
+    githubText: "Voir le code source et les versions sur GitHub.",
   },
 };
 
