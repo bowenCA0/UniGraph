@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UniGraph - Student-friendly academic plotting tool</title>
+    <meta
+      name="description"
+      content="UniGraph is a low-barrier plotting tool for physics, accounting, and finance students, with Excel/CSV import, academic charts, discipline visuals, and one-click analysis."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="UniGraph home" data-i18n-aria="brandAria">
+        <span class="brand-mark">U</span>
+        <span>UniGraph</span>
+      </a>
+      <div class="header-actions">
+        <nav class="nav-links" aria-label="Primary navigation" data-i18n-aria="navAria">
+          <a href="#features" data-i18n="navFeatures">Features</a>
+          <a href="#download" data-i18n="navDownload">Download</a>
+          <a href="#contact" data-i18n="navContact">Contact</a>
+        </nav>
+        <div class="language-switcher">
+          <label for="languageSelect" data-i18n="languageLabel">Language</label>
+          <select id="languageSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="fr">Français</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="heroEyebrow">Physics · Accounting · Finance</p>
+          <h1 data-i18n="heroTitle">UniGraph student-friendly academic plotting tool</h1>
+          <p class="hero-text" data-i18n="heroText">
+            Import Excel or CSV files, choose X/Y data ranges, and create charts for lab reports, coursework, and financial analysis. The current desktop version is free and does not require login.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/bowenCA0/UniGraph/releases/latest/download/UniGraph.exe" data-i18n="downloadWindows">Download Windows EXE</a>
+            <a class="button secondary" href="#features" data-i18n="viewFeatures">View features</a>
+          </div>
+          <p class="download-note" data-i18n-html="downloadNote">
+            If the download button is not available yet, run <code>.\build_exe.ps1</code> in the project root first.
+          </p>
+        </div>
+
+        <div class="product-preview" aria-label="UniGraph app preview" data-i18n-aria="previewAria">
+          <div class="window-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+            <strong data-i18n="mockWindowTitle">UniGraph Desktop</strong>
+          </div>
+          <div class="app-mock">
+            <aside class="mock-sidebar">
+              <label data-i18n="mockMajor">Major</label>
+              <div class="mock-select" data-i18n="mockPhysics">Physics</div>
+              <label data-i18n="mockMode">Mode</label>
+              <div class="mock-select" data-i18n="mockManual">Manual X/Y plot</div>
+              <label data-i18n="mockChart">Chart</label>
+              <div class="mock-select" data-i18n="mockAcademic">Academic style</div>
+              <button data-i18n="mockCreate">Create chart</button>
+            </aside>
+            <section class="mock-chart">
+              <div class="mock-toolbar">
+                <span data-i18n="mockImageParams">Image parameters</span>
+                <span data-i18n="mockAcademic">Academic style</span>
+                <span data-i18n="mockScientific">Scientific notation</span>
+              </div>
+              <div class="chart-card">
+                <svg viewBox="0 0 520 300" role="img" aria-label="Academic chart example" data-i18n-aria="chartAria">
+                  <defs>
+                    <pattern id="grid" width="52" height="38" patternUnits="userSpaceOnUse">
+                      <path d="M 52 0 L 0 0 0 38" fill="none" stroke="#d8dee8" stroke-width="1" />
+                    </pattern>
+                  </defs>
+                  <rect width="520" height="300" fill="url(#grid)" />
+                  <path d="M 34 260 L 486 260" stroke="#222" stroke-width="2" />
+                  <path d="M 34 260 L 34 24" stroke="#222" stroke-width="2" />
+                  <polyline
+                    points="45,252 88,251 132,249 176,247 220,240 264,216 308,154 352,114 396,74 440,44 482,28"
+                    fill="none"
+                    stroke="#1769aa"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                  <polyline
+                    points="306,160 352,113 396,76 440,43 482,24"
+                    fill="none"
+                    stroke="#101820"
+                    stroke-width="3"
+                    stroke-dasharray="9 8"
+                  />
+                  <g fill="#1769aa">
+                    <circle cx="45" cy="252" r="5" />
+                    <circle cx="88" cy="251" r="5" />
+                    <circle cx="132" cy="249" r="5" />
+                    <circle cx="176" cy="247" r="5" />
+                    <circle cx="220" cy="240" r="5" />
+                    <circle cx="264" cy="216" r="5" />
+                    <circle cx="308" cy="154" r="5" />
+                    <circle cx="352" cy="114" r="5" />
+                    <circle cx="396" cy="74" r="5" />
+                    <circle cx="440" cy="44" r="5" />
+                    <circle cx="482" cy="28" r="5" />
+                  </g>
+                </svg>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="featuresEyebrow">What it does</p>
+          <h2 data-i18n="featuresTitle">From data import to paper-ready charts in one path</h2>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <h3 data-i18n="physicsTitle">Physics lab plotting</h3>
+            <p data-i18n="physicsText">Manually select X/Y ranges, read data vertically or horizontally, add error bars, fit curves, calculate slopes, and run one-click linear regression analysis.</p>
+          </article>
+          <article>
+            <h3 data-i18n="accountingTitle">Accounting visuals</h3>
+            <p data-i18n="accountingText">Create bar charts, pie charts, and cash-flow waterfall charts for reports, coursework, and financial explanations.</p>
+          </article>
+          <article>
+            <h3 data-i18n="financeTitle">Finance analysis charts</h3>
+            <p data-i18n="financeText">Build risk-return charts, portfolio visuals, cumulative returns, and correlation heatmaps to help students understand asset data.</p>
+          </article>
+          <article>
+            <h3 data-i18n="desktopTitle">Desktop first</h3>
+            <p data-i18n="desktopText">The Windows EXE runs independently, so users can open it even without a Python environment.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="download" class="download-section">
+        <div>
+          <p class="eyebrow" data-i18n="downloadEyebrow">Download</p>
+          <h2 data-i18n="downloadTitle">Download UniGraph Desktop</h2>
+          <p data-i18n="downloadText">The current version is for Windows. On first launch, it shows a language and loading dialog, then remembers the user's language.</p>
+        </div>
+        <a class="button primary" href="https://github.com/bowenCA0/UniGraph/releases/latest/download/UniGraph.exe" data-i18n="downloadExe">Download UniGraph.exe</a>
+      </section>
+
+      <section id="contact" class="section contact-section">
+        <div class="section-heading">
+          <p class="eyebrow" data-i18n="contactEyebrow">Connect</p>
+          <h2 data-i18n="contactTitle">Follow project updates</h2>
+        </div>
+        <div class="link-cards">
+          <a class="link-card xhs" href="https://www.xiaohongshu.com/" target="_blank" rel="noopener">
+            <span data-i18n="xhsLabel">Xiaohongshu</span>
+            <strong data-i18n="xhsTitle">View author updates</strong>
+            <small data-i18n="xhsText">Replace this with your personal profile link when ready.</small>
+          </a>
+          <a class="link-card github disabled" href="#" aria-disabled="true">
+            <span>GitHub</span>
+            <strong data-i18n="githubTitle">Open-source link coming soon</strong>
+            <small data-i18n="githubText">Add the repository URL later.</small>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Copyright bowen</span>
+      <span>UniGraph.online</span>
+    </footer>
+
+    <script src="./site.js"></script>
+  </body>
+</html>

@@ -41,6 +41,7 @@ Then open the local URL printed by Streamlit, usually `http://localhost:8501`.
 ## Official Website
 
 The static product website is in `web\`.
+It supports English, Chinese, and French with a browser-side language switcher.
 
 Open it locally with:
 
@@ -48,7 +49,9 @@ Open it locally with:
 Start-Process .\web\index.html
 ```
 
-After packaging, `build_exe.ps1` copies the Windows app to `web\downloads\UniGraph.exe`, so the website download button can serve the executable directly.
+The website download button points to the latest GitHub Release asset:
+`https://github.com/bowenCA0/UniGraph/releases/latest/download/UniGraph.exe`.
+This keeps large downloads on GitHub instead of the website server.
 Replace the Xiaohongshu placeholder link in `web\index.html` with your personal profile URL when ready.
 The GitHub open-source link is currently a placeholder and can be filled in later.
 
