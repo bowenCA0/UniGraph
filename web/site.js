@@ -8,6 +8,7 @@ const translations = {
     navFeatures: "Features",
     navDownload: "Download",
     navContact: "Contact",
+    navSupport: "Support",
     languageLabel: "Language",
     heroEyebrow: "Physics · Accounting · Finance",
     heroTitle: "UniGraph student-friendly academic plotting tool",
@@ -54,6 +55,24 @@ const translations = {
     xhsText: "Open the author's Xiaohongshu profile for updates, tutorials, and release notes.",
     githubTitle: "Open-source repository",
     githubText: "View the source code and releases on GitHub.",
+    supportEyebrow: "Support",
+    supportTitle: "Support a free student project",
+    supportText:
+      "UniGraph is currently free for every student and teacher. Your support helps keep development moving, fund releases, and make the tool better for future classrooms.",
+    supportButton: "Support the author",
+    closeDonation: "Close support dialog",
+    donationEyebrow: "Support UniGraph",
+    donationTitle: "Choose a support method",
+    donationText:
+      "This project is free today because it is built for learning first. Every contribution, small or large, becomes energy for maintenance, tutorials, and the next useful feature.",
+    okxAlt: "OKX crypto support QR code",
+    okxLabel: "Crypto",
+    okxText: "For supporters who prefer digital assets.",
+    tngAlt: "Touch 'n Go support QR code",
+    tngText: "A convenient option for Malaysia-based supporters.",
+    aliAlt: "Alipay support QR code",
+    aliLabel: "Alipay",
+    aliText: "A familiar option for Chinese users.",
   },
   zh: {
     pageTitle: "UniGraph - 学生友好的学术绘图工具",
@@ -64,6 +83,7 @@ const translations = {
     navFeatures: "功能",
     navDownload: "下载",
     navContact: "联系",
+    navSupport: "支持",
     languageLabel: "语言",
     heroEyebrow: "物理 · 会计 · 金融",
     heroTitle: "UniGraph 学生友好的学术绘图工具",
@@ -106,6 +126,24 @@ const translations = {
     xhsText: "打开作者小红书主页，查看项目动态、教程和版本说明。",
     githubTitle: "开源仓库",
     githubText: "在 GitHub 查看源代码和版本发布。",
+    supportEyebrow: "支持",
+    supportTitle: "支持一个免费的学生项目",
+    supportText:
+      "UniGraph 目前面向所有学生和老师免费开放。你的支持会成为持续更新、制作教程、完善功能的动力。",
+    supportButton: "支持与打赏作者",
+    closeDonation: "关闭打赏窗口",
+    donationEyebrow: "支持 UniGraph",
+    donationTitle: "选择打赏方式",
+    donationText:
+      "这个项目目前完全免费，因为它首先是为学习而做。每一份支持，无论大小，都会变成维护、教程和下一项实用功能的动力。",
+    okxAlt: "OKX 加密货币打赏二维码",
+    okxLabel: "加密货币",
+    okxText: "适合希望使用数字资产支持项目的用户。",
+    tngAlt: "Touch 'n Go 打赏二维码",
+    tngText: "适合马来西亚用户的便捷支持方式。",
+    aliAlt: "支付宝打赏二维码",
+    aliLabel: "支付宝",
+    aliText: "适合中国用户的常用支持方式。",
   },
   fr: {
     pageTitle: "UniGraph - Outil de tracé académique pour étudiants",
@@ -116,6 +154,7 @@ const translations = {
     navFeatures: "Fonctions",
     navDownload: "Télécharger",
     navContact: "Contact",
+    navSupport: "Soutenir",
     languageLabel: "Langue",
     heroEyebrow: "Physique · Comptabilité · Finance",
     heroTitle: "UniGraph, outil de tracé académique pour étudiants",
@@ -162,11 +201,31 @@ const translations = {
     xhsText: "Ouvrir le profil Xiaohongshu de l'auteur pour les nouveautés, tutoriels et notes de version.",
     githubTitle: "Dépôt open source",
     githubText: "Voir le code source et les versions sur GitHub.",
+    supportEyebrow: "Soutien",
+    supportTitle: "Soutenir un projet étudiant gratuit",
+    supportText:
+      "UniGraph est actuellement gratuit pour tous les étudiants et enseignants. Votre soutien aide à maintenir le développement, publier de nouvelles versions et améliorer l'outil pour les cours à venir.",
+    supportButton: "Soutenir l'auteur",
+    closeDonation: "Fermer la fenêtre de soutien",
+    donationEyebrow: "Soutenir UniGraph",
+    donationTitle: "Choisir une méthode de soutien",
+    donationText:
+      "Ce projet est gratuit aujourd'hui parce qu'il est d'abord conçu pour l'apprentissage. Chaque contribution, petite ou grande, devient une énergie pour la maintenance, les tutoriels et les prochaines fonctions utiles.",
+    okxAlt: "QR code de soutien crypto OKX",
+    okxLabel: "Crypto",
+    okxText: "Pour les personnes qui préfèrent soutenir avec des actifs numériques.",
+    tngAlt: "QR code de soutien Touch 'n Go",
+    tngText: "Une option pratique pour les soutiens basés en Malaisie.",
+    aliAlt: "QR code de soutien Alipay",
+    aliLabel: "Alipay",
+    aliText: "Une option familière pour les utilisateurs chinois.",
   },
 };
 
 const languageSelect = document.querySelector("#languageSelect");
 const metaDescription = document.querySelector('meta[name="description"]');
+const donationModal = document.querySelector("#donationModal");
+const supportOpenButton = document.querySelector(".support-open");
 
 function normalizeLanguage(language) {
   if (language && language.startsWith("zh")) {
@@ -216,12 +275,41 @@ function setLanguage(language) {
     }
   });
 
+  document.querySelectorAll("[data-i18n-alt]").forEach((element) => {
+    const key = element.getAttribute("data-i18n-alt");
+    if (dictionary[key]) {
+      element.setAttribute("alt", dictionary[key]);
+    }
+  });
+
   languageSelect.value = selected;
   localStorage.setItem("unigraph-site-language", selected);
 }
 
 languageSelect.addEventListener("change", (event) => {
   setLanguage(event.target.value);
+});
+
+function openDonationModal() {
+  donationModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeDonationModal() {
+  donationModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+supportOpenButton.addEventListener("click", openDonationModal);
+
+document.querySelectorAll("[data-donation-close]").forEach((element) => {
+  element.addEventListener("click", closeDonationModal);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && donationModal.getAttribute("aria-hidden") === "false") {
+    closeDonationModal();
+  }
 });
 
 setLanguage(getInitialLanguage());
