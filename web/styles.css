@@ -1135,6 +1135,25 @@ code {
     align-items: stretch;
   }
 
+  .support-panel,
+  .site-footer {
+    flex-direction: column;
+  }
+
+  .support-panel {
+    gap: 22px;
+    padding: 30px 24px;
+  }
+
+  .support-copy {
+    max-width: none;
+  }
+
+  .support-open {
+    width: 100%;
+    min-height: 48px;
+  }
+
   .support-main {
     padding-top: 24px;
   }
