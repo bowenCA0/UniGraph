@@ -224,6 +224,8 @@ const translations = {
 
 const languageSelect = document.querySelector("#languageSelect");
 const metaDescription = document.querySelector('meta[name="description"]');
+const header = document.querySelector(".site-header");
+const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function normalizeLanguage(language) {
   if (language && language.startsWith("zh")) {
@@ -288,4 +290,73 @@ languageSelect.addEventListener("change", (event) => {
   setLanguage(event.target.value);
 });
 
+function setupMotion() {
+  if (motionQuery.matches) {
+    document.documentElement.classList.add("reduce-motion");
+    return;
+  }
+
+  const revealElements = [
+    ".hero-copy",
+    ".product-preview",
+    ".section-heading",
+    ".feature-grid article",
+    ".download-section",
+    ".link-card",
+    ".support-panel",
+  ];
+
+  document.querySelectorAll(revealElements.join(",")).forEach((element, index) => {
+    element.classList.add("reveal");
+    element.style.setProperty("--reveal-delay", `${Math.min(index * 55, 360)}ms`);
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.16, rootMargin: "0px 0px -8% 0px" },
+  );
+
+  document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+
+  const parallaxItems = [
+    { element: document.querySelector(".product-preview"), speed: -0.055, limit: 34 },
+    { element: document.querySelector(".download-section"), speed: 0.025, limit: 18 },
+    { element: document.querySelector(".support-panel"), speed: -0.028, limit: 22 },
+  ].filter((item) => item.element);
+
+  let ticking = false;
+
+  function updateScrollMotion() {
+    const y = window.scrollY || 0;
+    header.classList.toggle("is-scrolled", y > 24);
+    parallaxItems.forEach(({ element, speed, limit }) => {
+      const rect = element.getBoundingClientRect();
+      const centerOffset = rect.top + rect.height / 2 - window.innerHeight / 2;
+      const raw = centerOffset * speed;
+      const clamped = Math.max(Math.min(raw, limit), -limit);
+      element.style.setProperty("--parallax-y", `${clamped.toFixed(2)}px`);
+    });
+    ticking = false;
+  }
+
+  function requestScrollMotion() {
+    if (!ticking) {
+      window.requestAnimationFrame(updateScrollMotion);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener("scroll", requestScrollMotion, { passive: true });
+  window.addEventListener("resize", requestScrollMotion);
+  requestScrollMotion();
+}
+
 setLanguage(getInitialLanguage());
+setupMotion();
