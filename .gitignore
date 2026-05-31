@@ -3,6 +3,7 @@ __pycache__/
 build/
 dist/
 *.spec
+assets/splash.png
 web/downloads/*.exe
 .DS_Store
 Thumbs.db

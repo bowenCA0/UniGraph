@@ -623,6 +623,7 @@ class UniGraphDesktop(tk.Tk):
         self.err_range = self._range_defaults(col=3)
 
         self._configure_window()
+        self._configure_styles()
         self._build_ui()
         self._refresh_text()
 
@@ -653,41 +654,95 @@ class UniGraphDesktop(tk.Tk):
         self.title(self.txt("title"))
         self.geometry("1280x820")
         self.minsize(1080, 700)
+        self.configure(bg="#1f232a")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
+
+    def _configure_styles(self) -> None:
+        self.palette = {
+            "activity": "#1f232a",
+            "sidebar": "#252a33",
+            "panel": "#2d333d",
+            "main": "#f3f6fa",
+            "surface": "#ffffff",
+            "text": "#e7edf5",
+            "muted": "#aeb8c6",
+            "dark_border": "#3a424f",
+            "light_border": "#d6dde8",
+            "accent": "#2f81f7",
+            "accent_hover": "#1f6feb",
+        }
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except tk.TclError:
+            pass
+        style.configure(".", font=("Microsoft YaHei", 10))
+        style.configure("App.TFrame", background=self.palette["main"])
+        style.configure("Sidebar.TFrame", background=self.palette["sidebar"])
+        style.configure("Activity.TFrame", background=self.palette["activity"])
+        style.configure("Panel.TFrame", background=self.palette["panel"])
+        style.configure("Main.TFrame", background=self.palette["main"])
+        style.configure("Chart.TFrame", background=self.palette["surface"])
+        style.configure("Sidebar.TLabel", background=self.palette["sidebar"], foreground=self.palette["text"])
+        style.configure("Sidebar.TCheckbutton", background=self.palette["sidebar"], foreground=self.palette["text"])
+        style.map("Sidebar.TCheckbutton", background=[("active", self.palette["sidebar"])])
+        style.configure("Sidebar.TLabelframe", background=self.palette["sidebar"], foreground=self.palette["text"], bordercolor=self.palette["dark_border"])
+        style.configure("Sidebar.TLabelframe.Label", background=self.palette["sidebar"], foreground=self.palette["text"], font=("Microsoft YaHei", 10, "bold"))
+        style.configure("Primary.TButton", background=self.palette["accent"], foreground="#ffffff", borderwidth=0, focusthickness=0, padding=(12, 8))
+        style.map("Primary.TButton", background=[("active", self.palette["accent_hover"]), ("pressed", "#1158c7")])
+        style.configure("Sidebar.TButton", background="#343b47", foreground=self.palette["text"], borderwidth=0, padding=(10, 7))
+        style.map("Sidebar.TButton", background=[("active", "#3d4654"), ("pressed", "#465061")])
+        style.configure("Collapse.TButton", background=self.palette["activity"], foreground=self.palette["muted"], borderwidth=0, padding=(6, 5))
+        style.map("Collapse.TButton", background=[("active", "#2b313b")], foreground=[("active", "#ffffff")])
+        style.configure("Main.TLabel", background=self.palette["main"], foreground="#243042")
+        style.configure("Chart.TButton", background="#ffffff", foreground="#243042", borderwidth=1, bordercolor=self.palette["light_border"], padding=(10, 6))
+        style.map("Chart.TButton", background=[("active", "#eef4ff")], bordercolor=[("active", self.palette["accent"])])
+        style.configure("Chart.TRadiobutton", background=self.palette["surface"], foreground="#243042")
+        style.configure("Chart.TCheckbutton", background=self.palette["surface"], foreground="#243042")
+        style.configure("Status.TLabel", background="#eef2f7", foreground="#445065")
+        style.configure("TNotebook", background=self.palette["main"], borderwidth=0)
+        style.configure("TNotebook.Tab", padding=(14, 8), background="#e6ebf2", foreground="#4a5568")
+        style.map("TNotebook.Tab", background=[("selected", "#ffffff"), ("active", "#f4f7fb")], foreground=[("selected", "#111827")])
+        style.configure("Treeview", background="#ffffff", fieldbackground="#ffffff", foreground="#1f2937", bordercolor=self.palette["light_border"], rowheight=28)
+        style.configure("Treeview.Heading", background="#edf2f7", foreground="#273449", font=("Microsoft YaHei", 10, "bold"))
+        style.map("Treeview", background=[("selected", "#dbeafe")], foreground=[("selected", "#111827")])
+        style.configure("TCombobox", fieldbackground="#ffffff", background="#ffffff", foreground="#111827", bordercolor=self.palette["light_border"])
+        style.configure("TSpinbox", fieldbackground="#ffffff", foreground="#111827", bordercolor=self.palette["light_border"])
 
     def _build_ui(self) -> None:
         self.layout_pane = tk.PanedWindow(
             self,
             orient=tk.HORIZONTAL,
             sashwidth=6,
-            sashrelief=tk.RAISED,
+            sashrelief=tk.FLAT,
             bd=0,
+            bg=self.palette["activity"],
             showhandle=False,
         )
         self.layout_pane.grid(row=0, column=0, sticky="nsew")
 
-        self.left_shell = ttk.Frame(self.layout_pane)
+        self.left_shell = ttk.Frame(self.layout_pane, style="Activity.TFrame")
         self.left_shell.columnconfigure(0, weight=1)
         self.left_shell.rowconfigure(1, weight=1)
-        self.left_toggle_button = ttk.Button(self.left_shell, command=self._toggle_left_sidebar)
+        self.left_toggle_button = ttk.Button(self.left_shell, command=self._toggle_left_sidebar, style="Collapse.TButton")
         self.left_toggle_button.grid(row=0, column=0, sticky="ew", padx=4, pady=(4, 0))
 
-        self.controls = ttk.Frame(self.left_shell, padding=12)
+        self.controls = ttk.Frame(self.left_shell, padding=12, style="Sidebar.TFrame")
         self.controls.grid(row=1, column=0, sticky="nsew")
         self.controls.columnconfigure(0, weight=1)
         self.controls.columnconfigure(1, weight=0)
         self.controls.rowconfigure(10, weight=1)
 
-        self.main_area = ttk.Frame(self.layout_pane, padding=(0, 12, 12, 12))
+        self.main_area = ttk.Frame(self.layout_pane, padding=(0, 12, 12, 12), style="Main.TFrame")
         self.main_area.rowconfigure(0, weight=1)
         self.main_area.columnconfigure(0, weight=1)
 
-        self.right_shell = ttk.Frame(self.layout_pane)
+        self.right_shell = ttk.Frame(self.layout_pane, style="Activity.TFrame")
         self.right_shell.columnconfigure(0, weight=1)
         self.right_shell.rowconfigure(1, weight=1)
-        self.right_toggle_button = ttk.Button(self.right_shell, command=self._toggle_right_sidebar)
+        self.right_toggle_button = ttk.Button(self.right_shell, command=self._toggle_right_sidebar, style="Collapse.TButton")
         self.right_toggle_button.grid(row=0, column=0, sticky="ew", padx=4, pady=(4, 0))
 
         self._build_controls()
@@ -698,11 +753,11 @@ class UniGraphDesktop(tk.Tk):
         self.layout_pane.add(self.main_area, minsize=520, stretch="always")
         self.layout_pane.add(self.right_shell, minsize=140, width=self.right_sidebar_width)
 
-        status_bar = ttk.Label(self, textvariable=self.status, anchor="w", padding=(12, 6))
+        status_bar = ttk.Label(self, textvariable=self.status, anchor="w", padding=(12, 6), style="Status.TLabel")
         status_bar.grid(row=1, column=0, sticky="ew")
 
     def _build_controls(self) -> None:
-        self.language_label = ttk.Label(self.controls)
+        self.language_label = ttk.Label(self.controls, style="Sidebar.TLabel")
         self.language_label.grid(row=0, column=0, sticky="w")
         self.language_combo = ttk.Combobox(
             self.controls,
@@ -714,40 +769,41 @@ class UniGraphDesktop(tk.Tk):
         self.language_combo.grid(row=1, column=0, sticky="ew", pady=(2, 10))
         self.language_combo.bind("<<ComboboxSelected>>", self._on_language)
 
-        self.major_label = ttk.Label(self.controls)
+        self.major_label = ttk.Label(self.controls, style="Sidebar.TLabel")
         self.major_label.grid(row=2, column=0, sticky="w")
         self.major_combo = ttk.Combobox(self.controls, state="readonly", width=24)
         self.major_combo.grid(row=3, column=0, sticky="ew", pady=(2, 10))
         self.major_combo.bind("<<ComboboxSelected>>", self._on_major_label)
 
-        self.open_button = ttk.Button(self.controls, command=self.open_file)
+        self.open_button = ttk.Button(self.controls, command=self.open_file, style="Primary.TButton")
         self.open_button.grid(row=4, column=0, sticky="ew", pady=(0, 8))
         self.header_check = ttk.Checkbutton(
             self.controls,
             variable=self.first_row_header,
             command=self.reload_file,
+            style="Sidebar.TCheckbutton",
         )
         self.header_check.grid(row=5, column=0, sticky="w", pady=(0, 8))
 
-        self.sheet_label = ttk.Label(self.controls)
+        self.sheet_label = ttk.Label(self.controls, style="Sidebar.TLabel")
         self.sheet_label.grid(row=6, column=0, sticky="w")
         self.sheet_combo = ttk.Combobox(self.controls, textvariable=self.sheet, state="readonly", width=24)
         self.sheet_combo.grid(row=7, column=0, sticky="ew", pady=(2, 10))
         self.sheet_combo.bind("<<ComboboxSelected>>", lambda _event: self.reload_file())
 
-        self.mode_label = ttk.Label(self.controls)
+        self.mode_label = ttk.Label(self.controls, style="Sidebar.TLabel")
         self.mode_label.grid(row=8, column=0, sticky="w")
         self.mode_combo = ttk.Combobox(self.controls, state="readonly", width=24)
         self.mode_combo.grid(row=9, column=0, sticky="ew", pady=(2, 10))
         self.mode_combo.bind("<<ComboboxSelected>>", self._on_mode_label)
 
-        self.form_canvas = tk.Canvas(self.controls, width=340, highlightthickness=0)
+        self.form_canvas = tk.Canvas(self.controls, width=340, highlightthickness=0, bg=self.palette["sidebar"])
         self.form_canvas.grid(row=10, column=0, sticky="nsew")
         self.form_scrollbar = ttk.Scrollbar(self.controls, orient="vertical", command=self.form_canvas.yview)
         self.form_scrollbar.grid(row=10, column=1, sticky="ns")
         self.form_canvas.configure(yscrollcommand=self.form_scrollbar.set)
 
-        self.form = ttk.Frame(self.form_canvas)
+        self.form = ttk.Frame(self.form_canvas, style="Sidebar.TFrame")
         self.form.columnconfigure(0, weight=1)
         self.form_window = self.form_canvas.create_window((0, 0), window=self.form, anchor="nw")
         self.form.bind("<Configure>", self._sync_form_scroll)
@@ -755,42 +811,43 @@ class UniGraphDesktop(tk.Tk):
         self.form_canvas.bind("<Enter>", lambda _event: self.form_canvas.bind_all("<MouseWheel>", self._on_form_mousewheel))
         self.form_canvas.bind("<Leave>", lambda _event: self.form_canvas.unbind_all("<MouseWheel>"))
 
-        self.figure_actions = ttk.LabelFrame(self.controls, padding=8)
+        self.figure_actions = ttk.LabelFrame(self.controls, padding=8, style="Sidebar.TLabelframe")
         self.figure_actions.grid(row=11, column=0, columnspan=2, sticky="ew", pady=(12, 0))
         self.figure_actions.columnconfigure(0, weight=1)
-        self.plot_button = ttk.Button(self.figure_actions, command=self.plot)
+        self.plot_button = ttk.Button(self.figure_actions, command=self.plot, style="Primary.TButton")
         self.plot_button.grid(row=0, column=0, sticky="ew")
 
     def _build_plot_area(self) -> None:
         self.notebook = ttk.Notebook(self.main_area)
         self.notebook.grid(row=0, column=0, sticky="nsew")
 
-        self.chart_tab = ttk.Frame(self.notebook)
-        self.preview_tab = ttk.Frame(self.notebook)
-        self.raw_tab = ttk.Frame(self.notebook)
+        self.chart_tab = ttk.Frame(self.notebook, style="Chart.TFrame")
+        self.preview_tab = ttk.Frame(self.notebook, style="Chart.TFrame")
+        self.raw_tab = ttk.Frame(self.notebook, style="Chart.TFrame")
         self.notebook.add(self.chart_tab, text=self.txt("chart"))
         self.notebook.add(self.preview_tab, text=self.txt("preview"))
         self.notebook.add(self.raw_tab, text=self.txt("raw_preview"))
 
         self.chart_tab.rowconfigure(1, weight=1)
         self.chart_tab.columnconfigure(0, weight=1)
-        self.chart_options = ttk.Frame(self.chart_tab, padding=(8, 6))
+        self.chart_options = ttk.Frame(self.chart_tab, padding=(10, 8), style="Chart.TFrame")
         self.chart_options.grid(row=0, column=0, sticky="ew")
         self.chart_options.columnconfigure(1, weight=1)
         self.chart_options.columnconfigure(7, weight=1)
-        self.image_params_button = ttk.Button(self.chart_options, command=self.open_image_params_dialog)
+        self.image_params_button = ttk.Button(self.chart_options, command=self.open_image_params_dialog, style="Chart.TButton")
         self.image_params_button.grid(row=0, column=0, sticky="w", pady=(0, 6))
-        self.support_button = ttk.Button(self.chart_options, command=self.open_support_page)
+        self.support_button = ttk.Button(self.chart_options, command=self.open_support_page, style="Chart.TButton")
         self.support_button.grid(row=0, column=7, sticky="e", pady=(0, 6), padx=(10, 0))
-        self.login_button = ttk.Button(self.chart_options, command=self.open_login_page)
+        self.login_button = ttk.Button(self.chart_options, command=self.open_login_page, style="Primary.TButton")
         self.login_button.grid(row=0, column=8, sticky="e", pady=(0, 6), padx=(10, 0))
-        self.plot_style_label = ttk.Label(self.chart_options)
+        self.plot_style_label = ttk.Label(self.chart_options, style="Main.TLabel")
         self.plot_style_label.grid(row=1, column=0, sticky="w", padx=(0, 8))
         self.academic_radio = ttk.Radiobutton(
             self.chart_options,
             variable=self.plot_style,
             value="academic",
             command=self._refresh_plot_if_ready,
+            style="Chart.TRadiobutton",
         )
         self.academic_radio.grid(row=1, column=1, sticky="w", padx=(0, 8))
         self.presentation_radio = ttk.Radiobutton(
@@ -798,18 +855,21 @@ class UniGraphDesktop(tk.Tk):
             variable=self.plot_style,
             value="presentation",
             command=self._refresh_plot_if_ready,
+            style="Chart.TRadiobutton",
         )
         self.presentation_radio.grid(row=1, column=2, sticky="w", padx=(0, 18))
         self.scientific_x_check = ttk.Checkbutton(
             self.chart_options,
             variable=self.scientific_x,
             command=self._refresh_plot_if_ready,
+            style="Chart.TCheckbutton",
         )
         self.scientific_x_check.grid(row=1, column=3, sticky="w", padx=(0, 10))
         self.scientific_y_check = ttk.Checkbutton(
             self.chart_options,
             variable=self.scientific_y,
             command=self._refresh_plot_if_ready,
+            style="Chart.TCheckbutton",
         )
         self.scientific_y_check.grid(row=1, column=4, sticky="w", padx=(0, 10))
 
@@ -825,15 +885,15 @@ class UniGraphDesktop(tk.Tk):
         self.raw_tree = self._make_tree(self.raw_tab, self.raw_note)
 
     def _build_saved_plots_sidebar(self) -> None:
-        self.figure_manager = ttk.LabelFrame(self.right_shell, padding=10)
+        self.figure_manager = ttk.LabelFrame(self.right_shell, padding=10, style="Sidebar.TLabelframe")
         self.figure_manager.grid(row=1, column=0, sticky="nsew", padx=(0, 12), pady=(4, 12))
         self.figure_manager.rowconfigure(3, weight=1)
         self.figure_manager.columnconfigure(0, weight=1)
-        self.new_plot_button = ttk.Button(self.figure_manager, command=self.new_figure)
+        self.new_plot_button = ttk.Button(self.figure_manager, command=self.new_figure, style="Primary.TButton")
         self.new_plot_button.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
-        self.combine_plot_button = ttk.Button(self.figure_manager, command=self.combine_selected_plots)
+        self.combine_plot_button = ttk.Button(self.figure_manager, command=self.combine_selected_plots, style="Sidebar.TButton")
         self.combine_plot_button.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 10))
-        self.saved_plots_label = ttk.Label(self.figure_manager)
+        self.saved_plots_label = ttk.Label(self.figure_manager, style="Sidebar.TLabel")
         self.saved_plots_label.grid(row=2, column=0, sticky="w", pady=(0, 6))
         self.saved_plots_list = tk.Listbox(
             self.figure_manager,
@@ -841,6 +901,14 @@ class UniGraphDesktop(tk.Tk):
             width=20,
             exportselection=False,
             activestyle="dotbox",
+            bg="#1f232a",
+            fg="#e7edf5",
+            selectbackground="#2f81f7",
+            selectforeground="#ffffff",
+            highlightthickness=1,
+            highlightbackground="#3a424f",
+            relief="flat",
+            borderwidth=0,
         )
         self.saved_plots_list.grid(row=3, column=0, sticky="nsew")
         yscroll = ttk.Scrollbar(self.figure_manager, orient="vertical", command=self.saved_plots_list.yview)
@@ -980,6 +1048,36 @@ class UniGraphDesktop(tk.Tk):
             if hasattr(self, name):
                 delattr(self, name)
 
+    def _polish_sidebar_widgets(self, parent: tk.Widget | None = None) -> None:
+        parent = parent or self.form
+        for child in parent.winfo_children():
+            cls = child.winfo_class()
+            try:
+                if cls == "TLabel":
+                    child.configure(style="Sidebar.TLabel")
+                elif cls == "TCheckbutton":
+                    child.configure(style="Sidebar.TCheckbutton")
+                elif cls == "TButton":
+                    child.configure(style="Sidebar.TButton")
+                elif cls == "TLabelframe":
+                    child.configure(style="Sidebar.TLabelframe")
+                elif cls == "TFrame":
+                    child.configure(style="Sidebar.TFrame")
+                elif isinstance(child, tk.Listbox):
+                    child.configure(
+                        bg="#1f232a",
+                        fg="#e7edf5",
+                        selectbackground="#2f81f7",
+                        selectforeground="#ffffff",
+                        highlightthickness=1,
+                        highlightbackground="#3a424f",
+                        relief="flat",
+                        borderwidth=0,
+                    )
+            except tk.TclError:
+                pass
+            self._polish_sidebar_widgets(child)
+
     def _build_manual_form(self) -> None:
         self._clear_form()
         row = 0
@@ -1053,6 +1151,8 @@ class UniGraphDesktop(tk.Tk):
 
         self.analysis_button = ttk.Button(self.form, text=self.txt("one_click_analysis"), command=self.analyze_current_xy_data)
         self.analysis_button.grid(row=row, column=0, sticky="ew", pady=(10, 0))
+        self.analysis_button.configure(style="Primary.TButton")
+        self._polish_sidebar_widgets()
 
     def _available_chart_items(self, include_domain: bool) -> list[tuple[str, str]]:
         items = [
@@ -1145,6 +1245,7 @@ class UniGraphDesktop(tk.Tk):
             self.value_combo = ttk.Combobox(self.form, textvariable=self.value_col, state="readonly", width=24)
             self.value_combo.grid(row=5, column=0, sticky="ew", pady=(2, 8))
             self._fill_column_combos()
+        self._polish_sidebar_widgets()
 
     def _refresh_text(self) -> None:
         self.title(self.txt("title"))
@@ -2213,6 +2314,13 @@ class UniGraphDesktop(tk.Tk):
 
 
 def main() -> None:
+    try:
+        import pyi_splash  # type: ignore[import-not-found]
+
+        pyi_splash.update_text("Starting UniGraph...")
+        pyi_splash.close()
+    except Exception:
+        pass
     language = _run_startup_dialog(_load_saved_language())
     app = UniGraphDesktop(initial_language=language)
     app.mainloop()
