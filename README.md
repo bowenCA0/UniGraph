@@ -28,6 +28,7 @@ Notes for distribution:
 - On first launch, the app shows a startup dialog with language selection, login, support/tip, loading text, and `Copyright bowen`.
 - The selected language is remembered on the user's computer for later launches.
 - The first launch can be slower because the packaged app unpacks its runtime internally.
+- On startup, the app quietly checks the latest GitHub Release. If there is no network, it skips the check; if a newer `.exe` exists, the user can update or skip.
 
 ## Path 2: Web App
 

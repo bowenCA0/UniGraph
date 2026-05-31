@@ -5,6 +5,9 @@ import os
 import json
 import subprocess
 import sys
+import threading
+import urllib.error
+import urllib.request
 import webbrowser
 from dataclasses import dataclass
 from pathlib import Path
@@ -29,8 +32,11 @@ rcParams["font.sans-serif"] = [
 rcParams["axes.unicode_minus"] = False
 
 MAX_PREVIEW_ROWS = 100000
+APP_VERSION = "0.1.2"
 LOGIN_URL = "https://unigraph.online"
-SUPPORT_URL = "https://unigraph.online/support"
+SUPPORT_URL = "https://unigraph.online/support.html"
+LATEST_RELEASE_API_URL = "https://api.github.com/repos/bowenCA0/UniGraph/releases/latest"
+LATEST_EXE_DOWNLOAD_URL = "https://github.com/bowenCA0/UniGraph/releases/latest/download/UniGraph.exe"
 
 
 TEXT = {
@@ -155,10 +161,16 @@ TEXT = {
         "login_failed": "无法打开登录页面，请手动访问 https://unigraph.online",
         "support_author": "支持与打赏作者",
         "support_opened": "已打开支持与打赏页面",
-        "support_failed": "无法打开支持页面，请手动访问 https://unigraph.online/support",
+        "support_failed": "无法打开支持页面，请手动访问 https://unigraph.online/support.html",
         "startup_loading": "加载中...",
         "startup_enter": "进入程序",
         "copyright": "版权所有 bowen",
+        "update_title": "发现新版本",
+        "update_message": "当前版本：{current}\n最新版本：{latest}\n\n是否现在下载更新？",
+        "update_now": "更新",
+        "update_skip": "跳过",
+        "update_opened": "已打开新版下载页面",
+        "update_open_failed": "无法打开下载页面，请手动访问 GitHub Release。",
     },
     "en": {
         "title": "UniGraph Desktop",
@@ -281,10 +293,16 @@ TEXT = {
         "login_failed": "Could not open the login page. Please visit https://unigraph.online",
         "support_author": "Support / Tip the author",
         "support_opened": "Opened the support page",
-        "support_failed": "Could not open the support page. Please visit https://unigraph.online/support",
+        "support_failed": "Could not open the support page. Please visit https://unigraph.online/support.html",
         "startup_loading": "Loading...",
         "startup_enter": "Enter app",
         "copyright": "Copyright bowen",
+        "update_title": "Update available",
+        "update_message": "Current version: {current}\nLatest version: {latest}\n\nDownload the update now?",
+        "update_now": "Update",
+        "update_skip": "Skip",
+        "update_opened": "Opened the update download page",
+        "update_open_failed": "Could not open the download page. Please visit GitHub Releases manually.",
     },
     "fr": {
         "title": "UniGraph bureau",
@@ -407,10 +425,16 @@ TEXT = {
         "login_failed": "Impossible d'ouvrir la page. Visitez https://unigraph.online",
         "support_author": "Soutenir l'auteur",
         "support_opened": "Page de soutien ouverte",
-        "support_failed": "Impossible d'ouvrir la page. Visitez https://unigraph.online/support",
+        "support_failed": "Impossible d'ouvrir la page. Visitez https://unigraph.online/support.html",
         "startup_loading": "Chargement...",
         "startup_enter": "Ouvrir l'application",
         "copyright": "Copyright bowen",
+        "update_title": "Mise à jour disponible",
+        "update_message": "Version actuelle : {current}\nDernière version : {latest}\n\nTélécharger la mise à jour maintenant ?",
+        "update_now": "Mettre à jour",
+        "update_skip": "Ignorer",
+        "update_opened": "Page de téléchargement ouverte",
+        "update_open_failed": "Impossible d'ouvrir la page. Visitez GitHub Releases manuellement.",
     },
 }
 
@@ -451,6 +475,40 @@ def _open_url(url: str) -> bool:
         return bool(webbrowser.open_new_tab(url))
     except Exception:
         return False
+
+
+def _version_parts(version: str) -> tuple[int, ...]:
+    clean = version.strip().lower().lstrip("v")
+    parts: list[int] = []
+    for chunk in clean.replace("-", ".").split("."):
+        digits = "".join(char for char in chunk if char.isdigit())
+        if digits == "":
+            break
+        parts.append(int(digits))
+    return tuple(parts or [0])
+
+
+def _is_newer_version(latest: str, current: str) -> bool:
+    latest_parts = list(_version_parts(latest))
+    current_parts = list(_version_parts(current))
+    length = max(len(latest_parts), len(current_parts))
+    latest_parts.extend([0] * (length - len(latest_parts)))
+    current_parts.extend([0] * (length - len(current_parts)))
+    return latest_parts > current_parts
+
+
+def _release_exe_download_url(release: dict[str, object]) -> str:
+    assets = release.get("assets")
+    if isinstance(assets, list):
+        for asset in assets:
+            if not isinstance(asset, dict):
+                continue
+            name = str(asset.get("name", ""))
+            if name.lower().endswith(".exe"):
+                download_url = str(asset.get("browser_download_url", ""))
+                if download_url:
+                    return download_url
+    return LATEST_EXE_DOWNLOAD_URL
 
 
 def _center_window(window: tk.Tk | tk.Toplevel, width: int, height: int) -> None:
@@ -626,6 +684,7 @@ class UniGraphDesktop(tk.Tk):
         self._configure_styles()
         self._build_ui()
         self._refresh_text()
+        self.after(1200, self.check_for_updates_async)
 
     def txt(self, key: str) -> str:
         return TEXT[self.lang.get()].get(key, key)
@@ -654,30 +713,35 @@ class UniGraphDesktop(tk.Tk):
         self.title(self.txt("title"))
         self.geometry("1280x820")
         self.minsize(1080, 700)
-        self.configure(bg="#1f232a")
+        self.configure(bg="#eef2f7")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
 
     def _configure_styles(self) -> None:
         self.palette = {
-            "activity": "#1f232a",
-            "sidebar": "#252a33",
-            "panel": "#2d333d",
-            "main": "#f3f6fa",
+            "activity": "#e8edf5",
+            "sidebar": "#f8fafc",
+            "panel": "#ffffff",
+            "main": "#eef2f7",
             "surface": "#ffffff",
-            "text": "#e7edf5",
-            "muted": "#aeb8c6",
-            "dark_border": "#3a424f",
+            "text": "#1f2937",
+            "muted": "#64748b",
+            "dark_border": "#d8e0ea",
             "light_border": "#d6dde8",
-            "accent": "#2f81f7",
-            "accent_hover": "#1f6feb",
+            "accent": "#2563eb",
+            "accent_hover": "#1d4ed8",
+            "soft_accent": "#eff6ff",
         }
         style = ttk.Style(self)
-        try:
-            style.theme_use("clam")
-        except tk.TclError:
-            pass
+        theme_names = set(style.theme_names())
+        for theme_name in ("vista", "winnative", "xpnative", "default", "clam"):
+            if theme_name in theme_names:
+                try:
+                    style.theme_use(theme_name)
+                    break
+                except tk.TclError:
+                    continue
         style.configure(".", font=("Microsoft YaHei", 10))
         style.configure("App.TFrame", background=self.palette["main"])
         style.configure("Sidebar.TFrame", background=self.palette["sidebar"])
@@ -688,15 +752,34 @@ class UniGraphDesktop(tk.Tk):
         style.configure("Sidebar.TLabel", background=self.palette["sidebar"], foreground=self.palette["text"])
         style.configure("Sidebar.TCheckbutton", background=self.palette["sidebar"], foreground=self.palette["text"])
         style.map("Sidebar.TCheckbutton", background=[("active", self.palette["sidebar"])])
-        style.configure("Sidebar.TLabelframe", background=self.palette["sidebar"], foreground=self.palette["text"], bordercolor=self.palette["dark_border"])
+        style.configure("Sidebar.TLabelframe", background=self.palette["sidebar"], foreground=self.palette["text"], bordercolor=self.palette["dark_border"], relief="solid")
         style.configure("Sidebar.TLabelframe.Label", background=self.palette["sidebar"], foreground=self.palette["text"], font=("Microsoft YaHei", 10, "bold"))
-        style.configure("Primary.TButton", background=self.palette["accent"], foreground="#ffffff", borderwidth=0, focusthickness=0, padding=(12, 8))
-        style.map("Primary.TButton", background=[("active", self.palette["accent_hover"]), ("pressed", "#1158c7")])
-        style.configure("Sidebar.TButton", background="#343b47", foreground=self.palette["text"], borderwidth=0, padding=(10, 7))
-        style.map("Sidebar.TButton", background=[("active", "#3d4654"), ("pressed", "#465061")])
+        style.configure(
+            "Primary.TButton",
+            background="#ffffff",
+            foreground="#0f172a",
+            borderwidth=1,
+            bordercolor=self.palette["accent"],
+            focusthickness=0,
+            padding=(12, 8),
+        )
+        style.map(
+            "Primary.TButton",
+            background=[("active", self.palette["soft_accent"]), ("pressed", "#dbeafe"), ("disabled", "#f8fafc")],
+            foreground=[("active", "#0f172a"), ("pressed", "#0f172a"), ("disabled", "#64748b")],
+            bordercolor=[("active", self.palette["accent"]), ("pressed", self.palette["accent"])],
+        )
+        style.configure("Sidebar.TButton", background="#ffffff", foreground=self.palette["text"], borderwidth=1, bordercolor=self.palette["dark_border"], padding=(10, 7))
+        style.map(
+            "Sidebar.TButton",
+            background=[("active", self.palette["soft_accent"]), ("pressed", "#dbeafe"), ("disabled", "#f8fafc")],
+            foreground=[("active", self.palette["text"]), ("pressed", self.palette["text"]), ("disabled", "#64748b")],
+            bordercolor=[("active", self.palette["accent"])],
+        )
         style.configure("Collapse.TButton", background=self.palette["activity"], foreground=self.palette["muted"], borderwidth=0, padding=(6, 5))
-        style.map("Collapse.TButton", background=[("active", "#2b313b")], foreground=[("active", "#ffffff")])
+        style.map("Collapse.TButton", background=[("active", "#dbe3ef")], foreground=[("active", self.palette["accent"])])
         style.configure("Main.TLabel", background=self.palette["main"], foreground="#243042")
+        style.configure("Chart.TLabel", background=self.palette["surface"], foreground="#243042")
         style.configure("Chart.TButton", background="#ffffff", foreground="#243042", borderwidth=1, bordercolor=self.palette["light_border"], padding=(10, 6))
         style.map("Chart.TButton", background=[("active", "#eef4ff")], bordercolor=[("active", self.palette["accent"])])
         style.configure("Chart.TRadiobutton", background=self.palette["surface"], foreground="#243042")
@@ -768,14 +851,16 @@ class UniGraphDesktop(tk.Tk):
         self.language_combo.set(LANGUAGE_NAMES.get(self.lang.get(), "中文"))
         self.language_combo.grid(row=1, column=0, sticky="ew", pady=(2, 10))
         self.language_combo.bind("<<ComboboxSelected>>", self._on_language)
+        self._disable_mousewheel_value_change(self.language_combo)
 
         self.major_label = ttk.Label(self.controls, style="Sidebar.TLabel")
         self.major_label.grid(row=2, column=0, sticky="w")
         self.major_combo = ttk.Combobox(self.controls, state="readonly", width=24)
         self.major_combo.grid(row=3, column=0, sticky="ew", pady=(2, 10))
         self.major_combo.bind("<<ComboboxSelected>>", self._on_major_label)
+        self._disable_mousewheel_value_change(self.major_combo)
 
-        self.open_button = ttk.Button(self.controls, command=self.open_file, style="Primary.TButton")
+        self.open_button = self._primary_button(self.controls, command=self.open_file)
         self.open_button.grid(row=4, column=0, sticky="ew", pady=(0, 8))
         self.header_check = ttk.Checkbutton(
             self.controls,
@@ -790,12 +875,14 @@ class UniGraphDesktop(tk.Tk):
         self.sheet_combo = ttk.Combobox(self.controls, textvariable=self.sheet, state="readonly", width=24)
         self.sheet_combo.grid(row=7, column=0, sticky="ew", pady=(2, 10))
         self.sheet_combo.bind("<<ComboboxSelected>>", lambda _event: self.reload_file())
+        self._disable_mousewheel_value_change(self.sheet_combo)
 
         self.mode_label = ttk.Label(self.controls, style="Sidebar.TLabel")
         self.mode_label.grid(row=8, column=0, sticky="w")
         self.mode_combo = ttk.Combobox(self.controls, state="readonly", width=24)
         self.mode_combo.grid(row=9, column=0, sticky="ew", pady=(2, 10))
         self.mode_combo.bind("<<ComboboxSelected>>", self._on_mode_label)
+        self._disable_mousewheel_value_change(self.mode_combo)
 
         self.form_canvas = tk.Canvas(self.controls, width=340, highlightthickness=0, bg=self.palette["sidebar"])
         self.form_canvas.grid(row=10, column=0, sticky="nsew")
@@ -814,7 +901,7 @@ class UniGraphDesktop(tk.Tk):
         self.figure_actions = ttk.LabelFrame(self.controls, padding=8, style="Sidebar.TLabelframe")
         self.figure_actions.grid(row=11, column=0, columnspan=2, sticky="ew", pady=(12, 0))
         self.figure_actions.columnconfigure(0, weight=1)
-        self.plot_button = ttk.Button(self.figure_actions, command=self.plot, style="Primary.TButton")
+        self.plot_button = self._primary_button(self.figure_actions, command=self.plot)
         self.plot_button.grid(row=0, column=0, sticky="ew")
 
     def _build_plot_area(self) -> None:
@@ -838,7 +925,7 @@ class UniGraphDesktop(tk.Tk):
         self.image_params_button.grid(row=0, column=0, sticky="w", pady=(0, 6))
         self.support_button = ttk.Button(self.chart_options, command=self.open_support_page, style="Chart.TButton")
         self.support_button.grid(row=0, column=7, sticky="e", pady=(0, 6), padx=(10, 0))
-        self.login_button = ttk.Button(self.chart_options, command=self.open_login_page, style="Primary.TButton")
+        self.login_button = self._primary_button(self.chart_options, command=self.open_login_page)
         self.login_button.grid(row=0, column=8, sticky="e", pady=(0, 6), padx=(10, 0))
         self.plot_style_label = ttk.Label(self.chart_options, style="Main.TLabel")
         self.plot_style_label.grid(row=1, column=0, sticky="w", padx=(0, 8))
@@ -889,7 +976,7 @@ class UniGraphDesktop(tk.Tk):
         self.figure_manager.grid(row=1, column=0, sticky="nsew", padx=(0, 12), pady=(4, 12))
         self.figure_manager.rowconfigure(3, weight=1)
         self.figure_manager.columnconfigure(0, weight=1)
-        self.new_plot_button = ttk.Button(self.figure_manager, command=self.new_figure, style="Primary.TButton")
+        self.new_plot_button = self._primary_button(self.figure_manager, command=self.new_figure)
         self.new_plot_button.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
         self.combine_plot_button = ttk.Button(self.figure_manager, command=self.combine_selected_plots, style="Sidebar.TButton")
         self.combine_plot_button.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 10))
@@ -901,12 +988,13 @@ class UniGraphDesktop(tk.Tk):
             width=20,
             exportselection=False,
             activestyle="dotbox",
-            bg="#1f232a",
-            fg="#e7edf5",
-            selectbackground="#2f81f7",
-            selectforeground="#ffffff",
+            bg="#ffffff",
+            fg=self.palette["text"],
+            selectbackground="#dbeafe",
+            selectforeground="#0f172a",
             highlightthickness=1,
-            highlightbackground="#3a424f",
+            highlightbackground=self.palette["dark_border"],
+            highlightcolor=self.palette["accent"],
             relief="flat",
             borderwidth=0,
         )
@@ -1041,6 +1129,37 @@ class UniGraphDesktop(tk.Tk):
     def _on_form_mousewheel(self, event: tk.Event) -> None:
         self.form_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
+    def _block_mousewheel(self, _event: tk.Event) -> str:
+        return "break"
+
+    def _disable_mousewheel_value_change(self, widget: tk.Widget) -> None:
+        widget.bind("<MouseWheel>", self._block_mousewheel)
+        widget.bind("<Button-4>", self._block_mousewheel)
+        widget.bind("<Button-5>", self._block_mousewheel)
+
+    def _int_entry(self, parent: tk.Widget, variable: IntVar, width: int = 8) -> ttk.Entry:
+        entry = ttk.Entry(parent, textvariable=variable, width=width)
+        self._disable_mousewheel_value_change(entry)
+        return entry
+
+    def _primary_button(self, parent: tk.Widget, command: object | None = None) -> tk.Button:
+        return tk.Button(
+            parent,
+            command=command,
+            bg=self.palette["accent"],
+            fg="#ffffff",
+            activebackground=self.palette["accent_hover"],
+            activeforeground="#ffffff",
+            disabledforeground="#dbeafe",
+            relief="flat",
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+            font=("Microsoft YaHei", 10),
+        )
+
     def _clear_form(self) -> None:
         for child in self.form.winfo_children():
             child.destroy()
@@ -1063,14 +1182,17 @@ class UniGraphDesktop(tk.Tk):
                     child.configure(style="Sidebar.TLabelframe")
                 elif cls == "TFrame":
                     child.configure(style="Sidebar.TFrame")
+                elif cls == "TCombobox":
+                    self._disable_mousewheel_value_change(child)
                 elif isinstance(child, tk.Listbox):
                     child.configure(
-                        bg="#1f232a",
-                        fg="#e7edf5",
-                        selectbackground="#2f81f7",
-                        selectforeground="#ffffff",
+                        bg="#ffffff",
+                        fg=self.palette["text"],
+                        selectbackground="#dbeafe",
+                        selectforeground="#0f172a",
                         highlightthickness=1,
-                        highlightbackground="#3a424f",
+                        highlightbackground=self.palette["dark_border"],
+                        highlightcolor=self.palette["accent"],
                         relief="flat",
                         borderwidth=0,
                     )
@@ -1145,13 +1267,13 @@ class UniGraphDesktop(tk.Tk):
         slope_frame.columnconfigure((0, 1), weight=1)
         ttk.Label(slope_frame, text=self.txt("slope_start")).grid(row=0, column=0, sticky="w")
         ttk.Label(slope_frame, text=self.txt("slope_end")).grid(row=0, column=1, sticky="w")
-        ttk.Spinbox(slope_frame, from_=1, to=9999, textvariable=self.slope_start, width=8).grid(row=1, column=0, sticky="ew", padx=(0, 4))
-        ttk.Spinbox(slope_frame, from_=1, to=9999, textvariable=self.slope_end, width=8).grid(row=1, column=1, sticky="ew", padx=(4, 0))
+        self._int_entry(slope_frame, self.slope_start, width=8).grid(row=1, column=0, sticky="ew", padx=(0, 4))
+        self._int_entry(slope_frame, self.slope_end, width=8).grid(row=1, column=1, sticky="ew", padx=(4, 0))
         row += 1
 
-        self.analysis_button = ttk.Button(self.form, text=self.txt("one_click_analysis"), command=self.analyze_current_xy_data)
+        self.analysis_button = self._primary_button(self.form, command=self.analyze_current_xy_data)
+        self.analysis_button.configure(text=self.txt("one_click_analysis"))
         self.analysis_button.grid(row=row, column=0, sticky="ew", pady=(10, 0))
-        self.analysis_button.configure(style="Primary.TButton")
         self._polish_sidebar_widgets()
 
     def _available_chart_items(self, include_domain: bool) -> list[tuple[str, str]]:
@@ -1185,6 +1307,7 @@ class UniGraphDesktop(tk.Tk):
         combo.current(0 if controls.orientation.get() == "vertical" else 1)
         combo.grid(row=0, column=1, sticky="ew", padx=(6, 0))
         combo.bind("<<ComboboxSelected>>", lambda event, item=controls: self._set_range_orientation(item, event.widget.current()))
+        self._disable_mousewheel_value_change(combo)
 
         if controls.orientation.get() == "vertical":
             fields = [
@@ -1202,7 +1325,7 @@ class UniGraphDesktop(tk.Tk):
             r = 1 + index // 2 * 2
             c = index % 2
             ttk.Label(frame, text=label).grid(row=r, column=c, sticky="w", pady=(6, 0))
-            ttk.Spinbox(frame, from_=1, to=99999, textvariable=variable, width=8).grid(row=r + 1, column=c, sticky="ew", padx=(0 if c == 0 else 6, 6 if c == 0 else 0))
+            self._int_entry(frame, variable, width=8).grid(row=r + 1, column=c, sticky="ew", padx=(0 if c == 0 else 6, 6 if c == 0 else 0))
         return row + 1
 
     def _set_range_orientation(self, controls: RangeControls, selected_index: int) -> None:
@@ -1450,6 +1573,74 @@ class UniGraphDesktop(tk.Tk):
             self.status.set(self.txt("support_opened"))
         else:
             messagebox.showerror(self.txt("title"), self.txt("support_failed"))
+
+    def check_for_updates_async(self) -> None:
+        worker = threading.Thread(target=self._check_for_updates_worker, daemon=True)
+        worker.start()
+
+    def _check_for_updates_worker(self) -> None:
+        request = urllib.request.Request(
+            LATEST_RELEASE_API_URL,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": f"UniGraph/{APP_VERSION}",
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=4) as response:
+                payload = response.read(200000)
+            release = json.loads(payload.decode("utf-8"))
+        except (OSError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            return
+        if not isinstance(release, dict):
+            return
+        latest_version = str(release.get("tag_name") or release.get("name") or "").strip()
+        if not latest_version or not _is_newer_version(latest_version, APP_VERSION):
+            return
+        download_url = _release_exe_download_url(release)
+        self.after(0, lambda: self._show_update_prompt(latest_version, download_url))
+
+    def _show_update_prompt(self, latest_version: str, download_url: str) -> None:
+        if not self.winfo_exists():
+            return
+        dialog = tk.Toplevel(self)
+        dialog.title(self.txt("update_title"))
+        dialog.transient(self)
+        dialog.resizable(False, False)
+        dialog.configure(bg="#ffffff")
+        dialog.columnconfigure(0, weight=1)
+
+        container = ttk.Frame(dialog, padding=18, style="Chart.TFrame")
+        container.grid(row=0, column=0, sticky="nsew")
+        container.columnconfigure(0, weight=1)
+
+        title = ttk.Label(container, text=self.txt("update_title"), font=("Microsoft YaHei", 12, "bold"), style="Chart.TLabel")
+        title.grid(row=0, column=0, sticky="w", pady=(0, 8))
+        message = self.txt("update_message").format(current=APP_VERSION, latest=latest_version.lstrip("v"))
+        ttk.Label(container, text=message, justify="left", style="Chart.TLabel").grid(row=1, column=0, sticky="ew")
+
+        buttons = ttk.Frame(container, style="Chart.TFrame")
+        buttons.grid(row=2, column=0, sticky="ew", pady=(16, 0))
+        buttons.columnconfigure((0, 1), weight=1)
+
+        def open_update() -> None:
+            dialog.destroy()
+            if _open_url(download_url):
+                self.status.set(self.txt("update_opened"))
+            else:
+                messagebox.showerror(self.txt("title"), self.txt("update_open_failed"), parent=self)
+
+        skip_button = ttk.Button(buttons, text=self.txt("update_skip"), command=dialog.destroy, style="Chart.TButton")
+        skip_button.grid(row=0, column=0, sticky="ew", padx=(0, 8))
+        update_button = self._primary_button(buttons, command=open_update)
+        update_button.configure(text=self.txt("update_now"))
+        update_button.grid(row=0, column=1, sticky="ew")
+
+        dialog.protocol("WM_DELETE_WINDOW", dialog.destroy)
+        dialog.update_idletasks()
+        _center_window(dialog, 420, 210)
+        dialog.lift()
+        dialog.focus_force()
 
     def _fill_tree(self, tree: ttk.Treeview, frame: pd.DataFrame) -> None:
         tree.delete(*tree.get_children())
