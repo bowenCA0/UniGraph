@@ -64,6 +64,11 @@ const translations = {
     xhsText: "Open the author's Xiaohongshu profile for updates, tutorials, and release notes.",
     githubTitle: "Open-source repository",
     githubText: "View the source code and releases on GitHub.",
+    authorEyebrow: "About the author",
+    authorTitle: "Bowen Cao",
+    authorBio:
+      "USM undergraduate physics student, Web3 full-stack developer, blockchain developer and builder, with long-running interests in IT, physics, and philosophy.",
+    authorEmail: "Cooperation: caobowen05@gmail.com",
     supportEyebrow: "Support",
     supportTitle: "Support a free student project",
     supportText:
@@ -144,6 +149,10 @@ const translations = {
     xhsText: "打开作者小红书主页，查看项目动态、教程和版本说明。",
     githubTitle: "开源仓库",
     githubText: "在 GitHub 查看源代码和版本发布。",
+    authorEyebrow: "关于作者",
+    authorTitle: "曹博文 Bowen Cao",
+    authorBio: "USM 物理本科在读，Web3 全栈开发者、区块链开发者与建设者，同时长期关注 IT、物理与哲学。",
+    authorEmail: "合作邮箱：caobowen05@gmail.com",
     supportEyebrow: "支持",
     supportTitle: "支持一个免费的学生项目",
     supportText:
@@ -228,6 +237,11 @@ const translations = {
     xhsText: "Ouvrir le profil Xiaohongshu de l'auteur pour les nouveautés, tutoriels et notes de version.",
     githubTitle: "Dépôt open source",
     githubText: "Voir le code source et les versions sur GitHub.",
+    authorEyebrow: "À propos de l'auteur",
+    authorTitle: "Bowen Cao",
+    authorBio:
+      "Étudiant en licence de physique à l'USM, développeur full-stack Web3, développeur blockchain et builder, intéressé par l'IT, la physique et la philosophie.",
+    authorEmail: "Coopération : caobowen05@gmail.com",
     supportEyebrow: "Soutien",
     supportTitle: "Soutenir un projet étudiant gratuit",
     supportText:
