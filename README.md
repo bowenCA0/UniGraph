@@ -42,7 +42,7 @@ Then open the local URL printed by Streamlit, usually `http://localhost:8501`.
 
 The static product website is in `web\`.
 It supports English, Chinese, and French with a browser-side language switcher.
-It also includes a support/tip panel with OKX crypto, Touch 'n Go, and Alipay QR codes.
+It also includes a separate support/tip page with OKX crypto, Touch 'n Go, and Alipay QR codes.
 
 Open it locally with:
 

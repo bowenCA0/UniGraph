@@ -59,7 +59,7 @@ const translations = {
     supportTitle: "Support a free student project",
     supportText:
       "UniGraph is currently free for every student and teacher. Your support helps keep development moving, fund releases, and make the tool better for future classrooms.",
-    supportButton: "Support the author",
+    supportButton: "Open support page",
     closeDonation: "Close support dialog",
     donationEyebrow: "Support UniGraph",
     donationTitle: "Choose a support method",
@@ -130,7 +130,7 @@ const translations = {
     supportTitle: "支持一个免费的学生项目",
     supportText:
       "UniGraph 目前面向所有学生和老师免费开放。你的支持会成为持续更新、制作教程、完善功能的动力。",
-    supportButton: "支持与打赏作者",
+    supportButton: "进入支持与打赏页面",
     closeDonation: "关闭打赏窗口",
     donationEyebrow: "支持 UniGraph",
     donationTitle: "选择打赏方式",
@@ -205,7 +205,7 @@ const translations = {
     supportTitle: "Soutenir un projet étudiant gratuit",
     supportText:
       "UniGraph est actuellement gratuit pour tous les étudiants et enseignants. Votre soutien aide à maintenir le développement, publier de nouvelles versions et améliorer l'outil pour les cours à venir.",
-    supportButton: "Soutenir l'auteur",
+    supportButton: "Ouvrir la page de soutien",
     closeDonation: "Fermer la fenêtre de soutien",
     donationEyebrow: "Soutenir UniGraph",
     donationTitle: "Choisir une méthode de soutien",
@@ -224,8 +224,6 @@ const translations = {
 
 const languageSelect = document.querySelector("#languageSelect");
 const metaDescription = document.querySelector('meta[name="description"]');
-const donationModal = document.querySelector("#donationModal");
-const supportOpenButton = document.querySelector(".support-open");
 
 function normalizeLanguage(language) {
   if (language && language.startsWith("zh")) {
@@ -288,28 +286,6 @@ function setLanguage(language) {
 
 languageSelect.addEventListener("change", (event) => {
   setLanguage(event.target.value);
-});
-
-function openDonationModal() {
-  donationModal.setAttribute("aria-hidden", "false");
-  document.body.classList.add("modal-open");
-}
-
-function closeDonationModal() {
-  donationModal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("modal-open");
-}
-
-supportOpenButton.addEventListener("click", openDonationModal);
-
-document.querySelectorAll("[data-donation-close]").forEach((element) => {
-  element.addEventListener("click", closeDonationModal);
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && donationModal.getAttribute("aria-hidden") === "false") {
-    closeDonationModal();
-  }
 });
 
 setLanguage(getInitialLanguage());

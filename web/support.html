@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Support UniGraph</title>
+    <meta
+      name="description"
+      content="Support UniGraph, a currently free student plotting project, through OKX crypto, Touch 'n Go, or Alipay."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="support-page">
+    <header class="site-header support-header">
+      <a class="brand" href="./index.html" aria-label="Back to UniGraph home" data-support-aria="brandAria">
+        <span class="brand-mark">U</span>
+        <span>UniGraph</span>
+      </a>
+      <div class="header-actions">
+        <nav class="nav-links" aria-label="Support navigation" data-support-aria="navAria">
+          <a href="./index.html" data-support-i18n="backHome">Home</a>
+          <a href="https://github.com/bowenCA0/UniGraph" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+        <div class="language-switcher">
+          <label for="supportLanguageSelect" data-support-i18n="languageLabel">Language</label>
+          <select id="supportLanguageSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="fr">Français</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="support-main">
+      <section class="support-hero">
+        <div class="support-hero-copy">
+          <p class="eyebrow" data-support-i18n="eyebrow">Support UniGraph</p>
+          <h1 data-support-i18n="title">Keep a free learning tool moving forward</h1>
+          <p data-support-i18n="intro">
+            UniGraph is currently a fully free project for students and teachers. If it saves your time, helps your class, or makes data analysis less intimidating, your support becomes the fuel for updates, tutorials, and long-term maintenance.
+          </p>
+        </div>
+        <div class="support-stats" aria-label="Project values" data-support-aria="statsAria">
+          <div>
+            <strong data-support-i18n="statFree">Free</strong>
+            <span data-support-i18n="statFreeText">Current desktop features</span>
+          </div>
+          <div>
+            <strong data-support-i18n="statStudents">Students</strong>
+            <span data-support-i18n="statStudentsText">Physics, accounting, finance</span>
+          </div>
+          <div>
+            <strong data-support-i18n="statUpdates">Updates</strong>
+            <span data-support-i18n="statUpdatesText">Powered by support</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="payment-workspace" aria-label="Choose support method" data-support-aria="workspaceAria">
+        <aside class="payment-menu">
+          <p class="eyebrow" data-support-i18n="chooseEyebrow">Choose method</p>
+          <button class="payment-option active" type="button" data-method="okx">
+            <span data-support-i18n="okxLabel">Crypto</span>
+            <strong>OKX</strong>
+            <small data-support-i18n="okxMenu">For digital asset supporters</small>
+          </button>
+          <button class="payment-option" type="button" data-method="tng">
+            <span>Touch 'n Go</span>
+            <strong>TNG</strong>
+            <small data-support-i18n="tngMenu">For Malaysia-based supporters</small>
+          </button>
+          <button class="payment-option" type="button" data-method="ali">
+            <span>Alipay</span>
+            <strong data-support-i18n="aliLabel">Alipay</strong>
+            <small data-support-i18n="aliMenu">For Chinese users</small>
+          </button>
+        </aside>
+
+        <section class="payment-detail">
+          <div class="payment-detail-copy">
+            <p class="eyebrow" id="methodKicker">Crypto</p>
+            <h2 id="methodTitle">OKX</h2>
+            <p id="methodDescription">Scan the QR code with OKX or a compatible crypto wallet.</p>
+          </div>
+          <div class="selected-qr">
+            <img id="methodQr" src="./okx.png" alt="OKX crypto support QR code" />
+          </div>
+          <p class="security-note" data-support-i18n="securityNote">
+            Please confirm the payment details in your app before sending. Thank you for supporting a project that stays accessible to learners.
+          </p>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Copyright bowen</span>
+      <span>UniGraph.online</span>
+    </footer>
+
+    <script src="./support.js"></script>
+  </body>
+</html>
