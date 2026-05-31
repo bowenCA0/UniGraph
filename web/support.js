@@ -25,6 +25,9 @@ const supportTranslations = {
     tngMenu: "For Malaysia-based supporters",
     aliLabel: "Alipay",
     aliMenu: "For Chinese users",
+    evmAddressLabel: "EVM address",
+    copyAddress: "Copy",
+    copiedAddress: "Copied",
     securityNote:
       "Please confirm the payment details in your app before sending. Thank you for supporting a project that stays accessible to learners.",
     methods: {
@@ -73,6 +76,9 @@ const supportTranslations = {
     tngMenu: "适合马来西亚用户",
     aliLabel: "支付宝",
     aliMenu: "适合中国用户",
+    evmAddressLabel: "EVM 地址",
+    copyAddress: "一键复制",
+    copiedAddress: "已复制",
     securityNote: "付款前请在应用中确认收款信息。感谢你支持一个持续对学习者开放的项目。",
     methods: {
       okx: {
@@ -121,6 +127,9 @@ const supportTranslations = {
     tngMenu: "Pour les soutiens en Malaisie",
     aliLabel: "Alipay",
     aliMenu: "Pour les utilisateurs chinois",
+    evmAddressLabel: "Adresse EVM",
+    copyAddress: "Copier",
+    copiedAddress: "Copié",
     securityNote:
       "Veuillez vérifier les détails de paiement dans votre application avant l'envoi. Merci de soutenir un projet qui reste accessible aux apprenants.",
     methods: {
@@ -158,6 +167,9 @@ const methodKicker = document.querySelector("#methodKicker");
 const methodTitle = document.querySelector("#methodTitle");
 const methodDescription = document.querySelector("#methodDescription");
 const methodQr = document.querySelector("#methodQr");
+const walletAddressPanel = document.querySelector("#walletAddressPanel");
+const evmAddress = document.querySelector("#evmAddress");
+const copyAddressButton = document.querySelector("#copyAddressButton");
 const methodButtons = Array.from(document.querySelectorAll(".payment-option"));
 let currentLanguage = "en";
 let currentMethod = "okx";
@@ -211,11 +223,14 @@ function setLanguage(language) {
 function setMethod(method) {
   currentMethod = supportTranslations[currentLanguage].methods[method] ? method : "okx";
   const details = supportTranslations[currentLanguage].methods[currentMethod];
+  const dictionary = supportTranslations[currentLanguage];
   methodKicker.textContent = details.kicker;
   methodTitle.textContent = details.title;
   methodDescription.textContent = details.description;
   methodQr.src = methodImages[currentMethod];
   methodQr.alt = details.alt;
+  copyAddressButton.textContent = dictionary.copyAddress;
+  walletAddressPanel.hidden = currentMethod !== "okx";
 
   methodButtons.forEach((button) => {
     const isActive = button.dataset.method === currentMethod;
@@ -230,6 +245,24 @@ languageSelect.addEventListener("change", (event) => {
 
 methodButtons.forEach((button) => {
   button.addEventListener("click", () => setMethod(button.dataset.method));
+});
+
+copyAddressButton.addEventListener("click", async () => {
+  const dictionary = supportTranslations[currentLanguage];
+  try {
+    await navigator.clipboard.writeText(evmAddress.textContent.trim());
+    copyAddressButton.textContent = dictionary.copiedAddress;
+    setTimeout(() => {
+      copyAddressButton.textContent = supportTranslations[currentLanguage].copyAddress;
+    }, 1400);
+  } catch (_error) {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(evmAddress);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    copyAddressButton.textContent = dictionary.copyAddress;
+  }
 });
 
 setLanguage(getInitialLanguage());
