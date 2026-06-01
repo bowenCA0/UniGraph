@@ -70,6 +70,15 @@ const translations = {
     authorBio:
       "USM undergraduate physics student, Web3 full-stack developer, blockchain developer and builder, with long-running interests in IT, physics, and philosophy.",
     authorEmail: "Cooperation: caobowen05@gmail.com",
+    tutorialGuideEyebrow: "Tutorials",
+    tutorialGuideTitle: "Learn each chart step by step",
+    tutorialGuideText:
+      "Bowen's tutorial page explains every chart type with use cases, data preparation, operation steps, parameter suggestions, and demo figures.",
+    tutorialGuideButton: "Open tutorials",
+    tutorialGuideAria: "Tutorial page preview",
+    tutorialGuideScatter: "Scatter",
+    tutorialGuideFinance: "Finance",
+    tutorialGuideAnalysis: "Analysis",
     supportEyebrow: "Support",
     supportTitle: "Support a free student project",
     supportText:
@@ -155,6 +164,14 @@ const translations = {
     authorTitle: "曹博文 Bowen Cao",
     authorBio: "USM 物理本科在读，Web3 全栈开发者、区块链开发者与建设者，同时长期关注 IT、物理与哲学。",
     authorEmail: "合作邮箱：caobowen05@gmail.com",
+    tutorialGuideEyebrow: "教程",
+    tutorialGuideTitle: "按图形类型一步步学习",
+    tutorialGuideText: "Bowen 编写的教程页按每类图形整理适用场景、数据准备、操作步骤、参数建议和演示图。",
+    tutorialGuideButton: "进入教程",
+    tutorialGuideAria: "教程页面预览",
+    tutorialGuideScatter: "散点图",
+    tutorialGuideFinance: "金融图",
+    tutorialGuideAnalysis: "数据分析",
     supportEyebrow: "支持",
     supportTitle: "支持一个免费的学生项目",
     supportText:
@@ -245,6 +262,15 @@ const translations = {
     authorBio:
       "Étudiant en licence de physique à l'USM, développeur full-stack Web3, développeur blockchain et builder, intéressé par l'IT, la physique et la philosophie.",
     authorEmail: "Coopération : caobowen05@gmail.com",
+    tutorialGuideEyebrow: "Tutoriels",
+    tutorialGuideTitle: "Apprendre chaque graphique étape par étape",
+    tutorialGuideText:
+      "La page de tutoriels de Bowen explique chaque type de graphique avec cas d'usage, préparation des données, étapes, paramètres et figures de démonstration.",
+    tutorialGuideButton: "Ouvrir les tutoriels",
+    tutorialGuideAria: "Aperçu de la page de tutoriels",
+    tutorialGuideScatter: "Nuage",
+    tutorialGuideFinance: "Finance",
+    tutorialGuideAnalysis: "Analyse",
     supportEyebrow: "Soutien",
     supportTitle: "Soutenir un projet étudiant gratuit",
     supportText:
@@ -347,6 +373,7 @@ function setupMotion() {
     ".feature-grid article",
     ".download-section",
     ".link-card",
+    ".tutorial-guide",
     ".support-panel",
   ];
 
@@ -372,6 +399,7 @@ function setupMotion() {
   const parallaxItems = [
     { element: document.querySelector(".product-preview"), speed: -0.055, limit: 34 },
     { element: document.querySelector(".download-section"), speed: 0.025, limit: 18 },
+    { element: document.querySelector(".tutorial-guide"), speed: 0.022, limit: 16 },
     { element: document.querySelector(".support-panel"), speed: -0.028, limit: 22 },
   ].filter((item) => item.element);
 

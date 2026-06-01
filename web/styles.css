@@ -674,6 +674,95 @@ code {
   background: var(--blue);
 }
 
+.tutorial-guide {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(360px, 1.15fr);
+  gap: clamp(22px, 4vw, 42px);
+  align-items: center;
+  margin: 0 clamp(20px, 5vw, 72px) clamp(56px, 7vw, 88px);
+  padding: clamp(30px, 5vw, 54px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(47, 125, 91, 0.09), transparent 34%),
+    #ffffff;
+  box-shadow: 0 18px 44px rgba(25, 38, 61, 0.09);
+  transform: translateY(var(--parallax-y, 0));
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.tutorial-guide:hover {
+  border-color: #bdd1e4;
+  box-shadow: 0 22px 52px rgba(25, 38, 61, 0.12);
+}
+
+.tutorial-guide-copy p:not(.eyebrow) {
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.tutorial-guide-copy .button {
+  margin-top: 24px;
+}
+
+.tutorial-guide-preview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.guide-card-mini {
+  display: grid;
+  gap: 12px;
+  min-height: 180px;
+  padding: 18px;
+  border: 1px solid #d6e2f0;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(23, 105, 170, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(23, 105, 170, 0.045) 1px, transparent 1px),
+    #f8fbff;
+  background-size: 26px 26px;
+}
+
+.guide-card-mini span {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.guide-card-mini svg {
+  align-self: end;
+  width: 100%;
+  height: auto;
+}
+
+.guide-card-mini path,
+.guide-card-mini polyline {
+  fill: none;
+  stroke: #17202a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.guide-card-mini polyline {
+  stroke: var(--blue);
+}
+
+.guide-card-mini:nth-child(2) polyline:nth-of-type(2) {
+  stroke: var(--green);
+}
+
+.guide-card-mini circle {
+  fill: var(--blue);
+}
+
 .tutorial-main {
   padding: clamp(34px, 6vw, 76px) clamp(20px, 5vw, 72px) clamp(56px, 8vw, 92px);
 }
@@ -1296,7 +1385,9 @@ code {
   }
 
   .download-section,
-  .security-advisory {
+  .security-advisory,
+  .tutorial-guide,
+  .tutorial-guide-preview {
     grid-template-columns: 1fr;
   }
 
@@ -1366,6 +1457,10 @@ code {
 
   .tutorial-main {
     padding-top: 28px;
+  }
+
+  .tutorial-guide {
+    margin-bottom: 40px;
   }
 
   .tutorial-card {
