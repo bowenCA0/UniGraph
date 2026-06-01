@@ -73,7 +73,7 @@ const translations = {
     tutorialGuideEyebrow: "Tutorials",
     tutorialGuideTitle: "Learn each chart step by step",
     tutorialGuideText:
-      "Bowen's tutorial page explains every chart type with use cases, data preparation, operation steps, parameter suggestions, and demo figures.",
+      "The tutorial page explains every chart type with use cases, data preparation, operation steps, parameter suggestions, and demo figures.",
     tutorialGuideButton: "Open tutorials",
     tutorialGuideAria: "Tutorial page preview",
     tutorialGuideScatter: "Scatter",
@@ -166,7 +166,7 @@ const translations = {
     authorEmail: "合作邮箱：caobowen05@gmail.com",
     tutorialGuideEyebrow: "教程",
     tutorialGuideTitle: "按图形类型一步步学习",
-    tutorialGuideText: "Bowen 编写的教程页按每类图形整理适用场景、数据准备、操作步骤、参数建议和演示图。",
+    tutorialGuideText: "教程页按每类图形整理适用场景、数据准备、操作步骤、参数建议和演示图。",
     tutorialGuideButton: "进入教程",
     tutorialGuideAria: "教程页面预览",
     tutorialGuideScatter: "散点图",
@@ -265,7 +265,7 @@ const translations = {
     tutorialGuideEyebrow: "Tutoriels",
     tutorialGuideTitle: "Apprendre chaque graphique étape par étape",
     tutorialGuideText:
-      "La page de tutoriels de Bowen explique chaque type de graphique avec cas d'usage, préparation des données, étapes, paramètres et figures de démonstration.",
+      "La page de tutoriels explique chaque type de graphique avec cas d'usage, préparation des données, étapes, paramètres et figures de démonstration.",
     tutorialGuideButton: "Ouvrir les tutoriels",
     tutorialGuideAria: "Aperçu de la page de tutoriels",
     tutorialGuideScatter: "Nuage",
