@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UniGraph Tutorials - Chart guides by Bowen</title>
+    <meta
+      name="description"
+      content="UniGraph tutorials by Bowen, covering scatter, line, bar, histogram, pie, waterfall, finance, dual-axis, and regression analysis charts."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="tutorial-page">
+    <header class="site-header tutorial-header">
+      <a class="brand" href="./index.html" aria-label="Back to UniGraph home" data-tutorial-aria="brandAria">
+        <span class="brand-mark">U</span>
+        <span>UniGraph</span>
+      </a>
+      <div class="header-actions">
+        <nav class="nav-links" aria-label="Tutorial navigation" data-tutorial-aria="navAria">
+          <a href="./index.html" data-tutorial-i18n="backHome">Home</a>
+          <a href="./index.html#download" data-tutorial-i18n="download">Download</a>
+          <a href="./support.html" data-tutorial-i18n="support">Support</a>
+          <a href="https://github.com/bowenCA0/UniGraph" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+        <div class="language-switcher">
+          <label for="tutorialLanguageSelect" data-tutorial-i18n="languageLabel">Language</label>
+          <select id="tutorialLanguageSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="fr">Français</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="tutorial-main">
+      <section class="tutorial-hero">
+        <div>
+          <p class="eyebrow" data-tutorial-i18n="heroEyebrow">Tutorials</p>
+          <h1 data-tutorial-i18n="heroTitle">UniGraph chart tutorials</h1>
+          <p data-tutorial-i18n="heroText">
+            Step-by-step guides for every chart type in UniGraph, written for students who want clean academic figures without fighting code first.
+          </p>
+          <div class="tutorial-author">
+            <span data-tutorial-i18n="authorLabel">Author standard</span>
+            <strong>Bowen</strong>
+          </div>
+        </div>
+        <div class="tutorial-start-card">
+          <p class="eyebrow" data-tutorial-i18n="quickEyebrow">Quick start</p>
+          <ol>
+            <li data-tutorial-i18n="quick1">Import an Excel or CSV file.</li>
+            <li data-tutorial-i18n="quick2">Choose your major and chart type.</li>
+            <li data-tutorial-i18n="quick3">Select X/Y data ranges vertically or horizontally.</li>
+            <li data-tutorial-i18n="quick4">Adjust image parameters, then create the chart.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="tutorial-toc" aria-label="Tutorial categories" data-tutorial-aria="tocAria">
+        <a href="#scatter" data-tutorial-i18n="tocScatter">Scatter</a>
+        <a href="#line" data-tutorial-i18n="tocLine">Line</a>
+        <a href="#bar" data-tutorial-i18n="tocBar">Bar</a>
+        <a href="#hist" data-tutorial-i18n="tocHist">Histogram</a>
+        <a href="#pie" data-tutorial-i18n="tocPie">Pie</a>
+        <a href="#waterfall" data-tutorial-i18n="tocWaterfall">Waterfall</a>
+        <a href="#risk" data-tutorial-i18n="tocRisk">Risk-return</a>
+        <a href="#portfolio" data-tutorial-i18n="tocPortfolio">Portfolio</a>
+        <a href="#cumulative" data-tutorial-i18n="tocCumulative">Cumulative</a>
+        <a href="#corr" data-tutorial-i18n="tocCorr">Heatmap</a>
+        <a href="#dual" data-tutorial-i18n="tocDual">Dual Y-axis</a>
+        <a href="#analysis" data-tutorial-i18n="tocAnalysis">Analysis</a>
+      </section>
+
+      <section class="tutorial-grid">
+        <article class="tutorial-card" id="scatter">
+          <div class="chart-demo scatter-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><circle cx="55" cy="103" r="4" /><circle cx="82" cy="93" r="4" /><circle cx="109" cy="79" r="4" /><circle cx="137" cy="70" r="4" /><circle cx="166" cy="52" r="4" /><circle cx="201" cy="36" r="4" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="scatterTitle">Scatter plot</h2>
+          <p data-tutorial-i18n="scatterUse">Best for lab measurements where every point is an observed X/Y pair.</p>
+          <ol>
+            <li data-tutorial-i18n="scatterStep1">Choose Manual X/Y plot and select Scatter.</li>
+            <li data-tutorial-i18n="scatterStep2">Set X and Y ranges; vertical mode means one column plus start/end rows.</li>
+            <li data-tutorial-i18n="scatterStep3">Open Image parameters to name axes, units, colors, and title.</li>
+            <li data-tutorial-i18n="scatterStep4">Enable fit or one-click analysis when you need regression results.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="scatterTip">Tip: For physics reports, keep academic style and add error bars when uncertainty is available.</p>
+        </article>
+
+        <article class="tutorial-card" id="line">
+          <div class="chart-demo line-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><polyline points="45,105 75,101 105,87 135,72 165,47 215,35" /><circle cx="75" cy="101" r="3" /><circle cx="135" cy="72" r="3" /><circle cx="215" cy="35" r="3" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="lineTitle">Line chart</h2>
+          <p data-tutorial-i18n="lineUse">Best for trends over time, current, voltage, or any ordered variable.</p>
+          <ol>
+            <li data-tutorial-i18n="lineStep1">Select Line after importing your data.</li>
+            <li data-tutorial-i18n="lineStep2">Make sure X values are ordered from small to large or in time order.</li>
+            <li data-tutorial-i18n="lineStep3">Use academic style for thin lines and clearer points.</li>
+            <li data-tutorial-i18n="lineStep4">Switch to scientific notation if tick labels are too long.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="lineTip">Tip: Use line charts for continuous trends, not unrelated categories.</p>
+        </article>
+
+        <article class="tutorial-card" id="bar">
+          <div class="chart-demo bar-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><rect x="50" y="78" width="24" height="44" /><rect x="94" y="56" width="24" height="66" /><rect x="138" y="38" width="24" height="84" /><rect x="182" y="68" width="24" height="54" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="barTitle">Bar chart</h2>
+          <p data-tutorial-i18n="barUse">Best for comparing categories such as expenses, departments, or experiment groups.</p>
+          <ol>
+            <li data-tutorial-i18n="barStep1">Use Accounting visuals or Manual X/Y plot, then select Bar.</li>
+            <li data-tutorial-i18n="barStep2">Choose a category column and a numeric value column.</li>
+            <li data-tutorial-i18n="barStep3">Keep labels short; rotate labels if categories are long.</li>
+            <li data-tutorial-i18n="barStep4">Use title and units to make the meaning explicit.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="barTip">Tip: Sort values before import if you want a ranked bar chart.</p>
+        </article>
+
+        <article class="tutorial-card" id="hist">
+          <div class="chart-demo hist-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><rect x="50" y="98" width="22" height="24" /><rect x="75" y="72" width="22" height="50" /><rect x="100" y="42" width="22" height="80" /><rect x="125" y="30" width="22" height="92" /><rect x="150" y="55" width="22" height="67" /><rect x="175" y="86" width="22" height="36" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="histTitle">Histogram</h2>
+          <p data-tutorial-i18n="histUse">Best for seeing the distribution of one numeric variable.</p>
+          <ol>
+            <li data-tutorial-i18n="histStep1">Select Histogram and choose the numeric data range.</li>
+            <li data-tutorial-i18n="histStep2">Use one variable only; categories should not be used here.</li>
+            <li data-tutorial-i18n="histStep3">Check whether the distribution is centered, skewed, or has outliers.</li>
+            <li data-tutorial-i18n="histStep4">Add a clear title describing the sample.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="histTip">Tip: Histograms explain spread; bar charts compare categories.</p>
+        </article>
+
+        <article class="tutorial-card" id="pie">
+          <div class="chart-demo pie-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><circle cx="132" cy="76" r="48" /><path d="M132 76V28A48 48 0 0 1 177 92Z" /><path d="M132 76L177 92A48 48 0 0 1 100 112Z" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="pieTitle">Pie chart</h2>
+          <p data-tutorial-i18n="pieUse">Best for showing composition, such as expense shares or portfolio weights.</p>
+          <ol>
+            <li data-tutorial-i18n="pieStep1">Choose Accounting visuals and select Pie chart.</li>
+            <li data-tutorial-i18n="pieStep2">Set the category column and value column.</li>
+            <li data-tutorial-i18n="pieStep3">Use positive values only and avoid too many slices.</li>
+            <li data-tutorial-i18n="pieStep4">If there are many small items, group them before import.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="pieTip">Tip: Pie charts work best for 3 to 6 categories.</p>
+        </article>
+
+        <article class="tutorial-card" id="waterfall">
+          <div class="chart-demo waterfall-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><rect x="48" y="72" width="28" height="50" /><rect x="88" y="46" width="28" height="26" /><rect x="128" y="46" width="28" height="38" /><rect x="168" y="84" width="28" height="25" /><path d="M76 72H88M116 46H128M156 84H168" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="waterfallTitle">Cash-flow waterfall</h2>
+          <p data-tutorial-i18n="waterfallUse">Best for explaining how inflows and outflows build a final result.</p>
+          <ol>
+            <li data-tutorial-i18n="waterfallStep1">Choose Accounting visuals and select Cash-flow waterfall.</li>
+            <li data-tutorial-i18n="waterfallStep2">Use one column for labels and one column for signed amounts.</li>
+            <li data-tutorial-i18n="waterfallStep3">Positive values increase the total; negative values decrease it.</li>
+            <li data-tutorial-i18n="waterfallStep4">Use a title such as Monthly cash movement or Budget bridge.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="waterfallTip">Tip: Waterfall charts are more explanatory than ordinary bars for financial movement.</p>
+        </article>
+
+        <article class="tutorial-card" id="risk">
+          <div class="chart-demo risk-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><circle cx="72" cy="92" r="6" /><circle cx="118" cy="70" r="6" /><circle cx="165" cy="50" r="6" /><circle cx="205" cy="82" r="6" /><text x="196" y="72">D</text></svg>
+          </div>
+          <h2 data-tutorial-i18n="riskTitle">Risk-return chart</h2>
+          <p data-tutorial-i18n="riskUse">Best for comparing assets by volatility and average return.</p>
+          <ol>
+            <li data-tutorial-i18n="riskStep1">Choose Finance and select Risk-return chart.</li>
+            <li data-tutorial-i18n="riskStep2">Select at least two asset price or value columns.</li>
+            <li data-tutorial-i18n="riskStep3">UniGraph calculates returns, standard deviation, and mean return.</li>
+            <li data-tutorial-i18n="riskStep4">Read rightward as higher risk and upward as higher reward.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="riskTip">Tip: Use consistent date intervals for all assets.</p>
+        </article>
+
+        <article class="tutorial-card" id="portfolio">
+          <div class="chart-demo portfolio-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><circle cx="132" cy="76" r="50" /><path d="M132 76L132 26A50 50 0 0 1 182 76Z" /><path d="M132 76L182 76A50 50 0 0 1 108 120Z" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="portfolioTitle">Portfolio chart</h2>
+          <p data-tutorial-i18n="portfolioUse">Best for showing how selected assets are allocated in a simple portfolio.</p>
+          <ol>
+            <li data-tutorial-i18n="portfolioStep1">Choose Finance and select Portfolio chart.</li>
+            <li data-tutorial-i18n="portfolioStep2">Select the asset columns you want to include.</li>
+            <li data-tutorial-i18n="portfolioStep3">Use clear asset names in your spreadsheet headers.</li>
+            <li data-tutorial-i18n="portfolioStep4">Use the chart as a visual summary, not as investment advice.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="portfolioTip">Tip: Keep asset names short so labels remain readable.</p>
+        </article>
+
+        <article class="tutorial-card" id="cumulative">
+          <div class="chart-demo cumulative-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><polyline points="42,105 72,96 102,100 132,78 162,64 192,44 222,38" /><polyline points="42,110 72,112 102,98 132,92 162,73 192,70 222,55" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="cumulativeTitle">Cumulative return chart</h2>
+          <p data-tutorial-i18n="cumulativeUse">Best for comparing asset growth paths over time.</p>
+          <ol>
+            <li data-tutorial-i18n="cumulativeStep1">Choose Finance and select Cumulative returns.</li>
+            <li data-tutorial-i18n="cumulativeStep2">Select asset columns with aligned dates or periods.</li>
+            <li data-tutorial-i18n="cumulativeStep3">Use the legend to compare growth paths.</li>
+            <li data-tutorial-i18n="cumulativeStep4">Check sudden jumps for missing or abnormal data.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="cumulativeTip">Tip: Clean missing values before comparing multiple assets.</p>
+        </article>
+
+        <article class="tutorial-card" id="corr">
+          <div class="chart-demo heatmap-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><rect x="62" y="28" width="36" height="36" /><rect x="100" y="28" width="36" height="36" /><rect x="138" y="28" width="36" height="36" /><rect x="62" y="66" width="36" height="36" /><rect x="100" y="66" width="36" height="36" /><rect x="138" y="66" width="36" height="36" /><rect x="62" y="104" width="36" height="36" /><rect x="100" y="104" width="36" height="36" /><rect x="138" y="104" width="36" height="36" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="corrTitle">Correlation heatmap</h2>
+          <p data-tutorial-i18n="corrUse">Best for seeing whether assets move together or independently.</p>
+          <ol>
+            <li data-tutorial-i18n="corrStep1">Choose Finance and select Correlation heatmap.</li>
+            <li data-tutorial-i18n="corrStep2">Select multiple asset columns.</li>
+            <li data-tutorial-i18n="corrStep3">Read values close to 1 as strong positive movement together.</li>
+            <li data-tutorial-i18n="corrStep4">Read values close to 0 as weaker relationship.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="corrTip">Tip: Correlation is useful, but it does not prove causation.</p>
+        </article>
+
+        <article class="tutorial-card" id="dual">
+          <div class="chart-demo dual-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18M238 122V18" /><polyline points="42,102 78,95 114,82 150,58 208,42" /><polyline points="42,40 78,55 114,66 150,83 208,104" /></svg>
+          </div>
+          <h2 data-tutorial-i18n="dualTitle">Dual Y-axis chart</h2>
+          <p data-tutorial-i18n="dualUse">Best for combining two saved charts with different Y units.</p>
+          <ol>
+            <li data-tutorial-i18n="dualStep1">Create the first chart and keep it in the right figure manager.</li>
+            <li data-tutorial-i18n="dualStep2">Click New figure and create the second chart.</li>
+            <li data-tutorial-i18n="dualStep3">Click Dual Y-axis chart and choose the figures to combine.</li>
+            <li data-tutorial-i18n="dualStep4">Name the combined chart and verify both axes are labeled.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="dualTip">Tip: Use dual axes only when the two variables share the same X meaning.</p>
+        </article>
+
+        <article class="tutorial-card" id="analysis">
+          <div class="chart-demo analysis-demo" aria-hidden="true">
+            <svg viewBox="0 0 260 150"><path d="M28 122H238M28 122V18" /><circle cx="58" cy="100" r="4" /><circle cx="90" cy="88" r="4" /><circle cx="125" cy="73" r="4" /><circle cx="165" cy="58" r="4" /><path d="M48 106L205 42" /><text x="62" y="36">y=ax+b</text></svg>
+          </div>
+          <h2 data-tutorial-i18n="analysisTitle">One-click data analysis</h2>
+          <p data-tutorial-i18n="analysisUse">Best for experiment reports that need slope, intercept, regression equation, r, and R².</p>
+          <ol>
+            <li data-tutorial-i18n="analysisStep1">Create a manual X/Y chart first.</li>
+            <li data-tutorial-i18n="analysisStep2">Click One-click analysis in the left panel.</li>
+            <li data-tutorial-i18n="analysisStep3">Select the X range used for the regression.</li>
+            <li data-tutorial-i18n="analysisStep4">Choose which results to add back onto the chart.</li>
+          </ol>
+          <p class="tutorial-tip" data-tutorial-i18n="analysisTip">Tip: Report both the equation and R² when explaining a linear relationship.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer tutorial-footer">
+      <span>Copyright bowen</span>
+      <span data-tutorial-i18n="footerAuthor">Tutorial author standard: Bowen</span>
+    </footer>
+
+    <script src="./tutorials.js"></script>
+  </body>
+</html>

@@ -674,6 +674,234 @@ code {
   background: var(--blue);
 }
 
+.tutorial-main {
+  padding: clamp(34px, 6vw, 76px) clamp(20px, 5vw, 72px) clamp(56px, 8vw, 92px);
+}
+
+.tutorial-hero {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(280px, 430px);
+  gap: clamp(24px, 5vw, 58px);
+  align-items: stretch;
+}
+
+.tutorial-hero h1 {
+  max-width: 780px;
+}
+
+.tutorial-hero p:not(.eyebrow) {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.tutorial-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.tutorial-author span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tutorial-start-card {
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.tutorial-start-card ol,
+.tutorial-card ol {
+  margin: 14px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.tutorial-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: clamp(28px, 5vw, 54px) 0 24px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(25, 38, 61, 0.06);
+}
+
+.tutorial-toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #d6e2f0;
+  border-radius: 8px;
+  color: var(--muted);
+  background: #f8fbff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.tutorial-toc a:hover {
+  color: white;
+  border-color: var(--blue);
+  background: var(--blue);
+}
+
+.tutorial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.tutorial-card {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 14px 34px rgba(25, 38, 61, 0.07);
+  scroll-margin-top: 96px;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.tutorial-card:hover {
+  transform: translateY(-4px);
+  border-color: #bdd1e4;
+  box-shadow: 0 18px 42px rgba(25, 38, 61, 0.1);
+}
+
+.tutorial-card h2 {
+  font-size: 24px;
+}
+
+.tutorial-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.72;
+}
+
+.tutorial-tip {
+  padding: 12px 14px;
+  border: 1px solid #d8e7df;
+  border-radius: 8px;
+  color: #2f604d !important;
+  background: #f4fbf7;
+  font-size: 14px;
+}
+
+.chart-demo {
+  display: grid;
+  min-height: 156px;
+  place-items: center;
+  border: 1px solid #d6e2f0;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(23, 105, 170, 0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(23, 105, 170, 0.055) 1px, transparent 1px),
+    #f8fbff;
+  background-size: 28px 28px;
+}
+
+.chart-demo svg {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+}
+
+.chart-demo path,
+.chart-demo polyline {
+  fill: none;
+  stroke: #17202a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.chart-demo circle,
+.chart-demo rect {
+  fill: var(--blue);
+}
+
+.chart-demo text {
+  fill: var(--muted);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.line-demo polyline,
+.cumulative-demo polyline:first-of-type,
+.dual-demo polyline:first-of-type {
+  stroke: var(--blue);
+}
+
+.cumulative-demo polyline:nth-of-type(2),
+.dual-demo polyline:nth-of-type(2) {
+  stroke: var(--green);
+}
+
+.pie-demo circle,
+.portfolio-demo circle {
+  fill: #dbeafe;
+  stroke: var(--blue);
+  stroke-width: 3;
+}
+
+.pie-demo path:first-of-type,
+.portfolio-demo path:first-of-type {
+  fill: var(--blue);
+}
+
+.pie-demo path:nth-of-type(2),
+.portfolio-demo path:nth-of-type(2) {
+  fill: var(--green);
+}
+
+.waterfall-demo rect:nth-of-type(3),
+.waterfall-demo rect:nth-of-type(4) {
+  fill: var(--red);
+}
+
+.heatmap-demo rect:nth-of-type(1),
+.heatmap-demo rect:nth-of-type(5),
+.heatmap-demo rect:nth-of-type(9) {
+  fill: #1769aa;
+}
+
+.heatmap-demo rect:nth-of-type(2),
+.heatmap-demo rect:nth-of-type(4),
+.heatmap-demo rect:nth-of-type(6) {
+  fill: #9cc7e8;
+}
+
+.heatmap-demo rect:nth-of-type(3),
+.heatmap-demo rect:nth-of-type(7),
+.heatmap-demo rect:nth-of-type(8) {
+  fill: #e7eff8;
+}
+
+.tutorial-footer {
+  margin-top: 0;
+}
+
 .support-section {
   padding: 0 clamp(20px, 5vw, 72px) clamp(56px, 7vw, 90px);
 }
@@ -1072,6 +1300,11 @@ code {
     grid-template-columns: 1fr;
   }
 
+  .tutorial-hero,
+  .tutorial-grid {
+    grid-template-columns: 1fr;
+  }
+
   .author-card {
     grid-template-columns: 1fr;
   }
@@ -1103,7 +1336,9 @@ code {
 
   .nav-links {
     width: 100%;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px 18px;
   }
 
   .language-switcher {
@@ -1127,6 +1362,18 @@ code {
   .feature-grid,
   .link-cards {
     grid-template-columns: 1fr;
+  }
+
+  .tutorial-main {
+    padding-top: 28px;
+  }
+
+  .tutorial-card {
+    padding: 18px;
+  }
+
+  .tutorial-toc {
+    gap: 8px;
   }
 
   .download-section,
