@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 import os
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -32,7 +33,7 @@ rcParams["font.sans-serif"] = [
 rcParams["axes.unicode_minus"] = False
 
 MAX_PREVIEW_ROWS = 100000
-APP_VERSION = "0.1.2"
+APP_VERSION = "0.1.3"
 LOGIN_URL = "https://unigraph.online"
 SUPPORT_URL = "https://unigraph.online/support.html"
 LATEST_RELEASE_API_URL = "https://api.github.com/repos/bowenCA0/UniGraph/releases/latest"
@@ -127,11 +128,17 @@ TEXT = {
         "scientific_x": "X 轴科学计数法",
         "scientific_y": "Y 轴科学计数法",
         "plot_title": "图形标题",
+        "smooth_curve": "平滑曲线",
+        "point_name": "点名称",
+        "curve_name": "曲线名称",
+        "default_point_name": "测量数据",
+        "default_curve_name": "平滑曲线",
+        "math_insert": "插入数学格式",
         "image_params": "图像参数设置",
         "x_axis_name": "X 轴名称",
         "y_axis_name": "Y 轴名称",
         "data_color": "数据颜色",
-        "fit_color": "拟合线颜色",
+        "fit_color": "拟合/曲线颜色",
         "grid_color": "网格颜色",
         "choose_color": "选择颜色",
         "apply": "应用",
@@ -259,11 +266,17 @@ TEXT = {
         "scientific_x": "Scientific X axis",
         "scientific_y": "Scientific Y axis",
         "plot_title": "Chart title",
+        "smooth_curve": "Smoothed curve",
+        "point_name": "Point name",
+        "curve_name": "Curve name",
+        "default_point_name": "Measured data",
+        "default_curve_name": "Smoothed curve",
+        "math_insert": "Insert math",
         "image_params": "Image parameters",
         "x_axis_name": "X-axis name",
         "y_axis_name": "Y-axis name",
         "data_color": "Data color",
-        "fit_color": "Fit line color",
+        "fit_color": "Fit/curve color",
         "grid_color": "Grid color",
         "choose_color": "Choose color",
         "apply": "Apply",
@@ -391,11 +404,17 @@ TEXT = {
         "scientific_x": "Axe X scientifique",
         "scientific_y": "Axe Y scientifique",
         "plot_title": "Titre du graphique",
+        "smooth_curve": "Courbe lissée",
+        "point_name": "Nom des points",
+        "curve_name": "Nom de la courbe",
+        "default_point_name": "Données mesurées",
+        "default_curve_name": "Courbe lissée",
+        "math_insert": "Insérer maths",
         "image_params": "Paramètres de l'image",
         "x_axis_name": "Nom de l'axe X",
         "y_axis_name": "Nom de l'axe Y",
         "data_color": "Couleur des données",
-        "fit_color": "Couleur de l'ajustement",
+        "fit_color": "Couleur ajustement/courbe",
         "grid_color": "Couleur de la grille",
         "choose_color": "Choisir",
         "apply": "Appliquer",
@@ -623,6 +642,9 @@ class SavedPlot:
     y_label: str
     title: str
     sheet: str
+    point_label: str = ""
+    curve_label: str = ""
+    show_smooth_curve: bool = False
     parts: list["SavedPlot"] | None = None
 
 
@@ -647,6 +669,7 @@ class UniGraphDesktop(tk.Tk):
         self.chart_kind = StringVar(value="scatter")
         self.show_axes = BooleanVar(value=True)
         self.use_error = BooleanVar(value=False)
+        self.show_smooth_curve = BooleanVar(value=False)
         self.fit_kind = StringVar(value="none")
         self.use_slope = BooleanVar(value=False)
         self.slope_start = IntVar(value=1)
@@ -662,6 +685,8 @@ class UniGraphDesktop(tk.Tk):
         self.scientific_x = BooleanVar(value=False)
         self.scientific_y = BooleanVar(value=False)
         self.plot_title = StringVar(value="")
+        self.point_label = StringVar(value=self.txt("default_point_name"))
+        self.curve_label = StringVar(value=self.txt("default_curve_name"))
         self.current_plot: SavedPlot | None = None
         self.saved_plots: list[SavedPlot] = []
         self.active_plot_index: int | None = None
@@ -1223,6 +1248,16 @@ class UniGraphDesktop(tk.Tk):
         self.chart_combo.bind("<<ComboboxSelected>>", self._on_chart_label)
         row += 1
 
+        if selected_key == "scatter":
+            self.smooth_curve_check = ttk.Checkbutton(
+                self.form,
+                text=self.txt("smooth_curve"),
+                variable=self.show_smooth_curve,
+                command=self._refresh_plot_if_ready,
+            )
+            self.smooth_curve_check.grid(row=row, column=0, sticky="w", pady=(0, 8))
+            row += 1
+
         row = self._range_frame(self.form, row, self.txt("x_range"), self.x_range)
         row = self._range_frame(self.form, row, self.txt("y_range"), self.y_range)
 
@@ -1442,6 +1477,7 @@ class UniGraphDesktop(tk.Tk):
             return
         self.chart_kind.set(selected_key)
         self.mode.set("manual")
+        self._build_manual_form()
 
     def _on_fit_label(self, _event: object) -> None:
         self.fit_kind.set(["none", "linear", "poly2"][self.fit_combo.current()])
@@ -1697,21 +1733,63 @@ class UniGraphDesktop(tk.Tk):
 
         fields = [
             (self.txt("plot_title"), self.plot_title),
+            (self.txt("point_name"), self.point_label),
+            (self.txt("curve_name"), self.curve_label),
             (self.txt("x_axis_name"), self.x_axis_name),
             (self.txt("x_unit"), self.x_unit),
             (self.txt("y_axis_name"), self.y_axis_name),
             (self.txt("y_unit"), self.y_unit),
         ]
+        math_entries: list[ttk.Entry] = []
+        active_math_entry: dict[str, ttk.Entry | None] = {"widget": None}
         for row, (label, variable) in enumerate(fields):
             ttk.Label(dialog, text=label).grid(row=row, column=0, sticky="w", padx=12, pady=(10 if row == 0 else 4, 4))
-            ttk.Entry(dialog, textvariable=variable, width=32).grid(row=row, column=1, sticky="ew", padx=12, pady=(10 if row == 0 else 4, 4))
+            entry = ttk.Entry(dialog, textvariable=variable, width=32)
+            entry.grid(row=row, column=1, sticky="ew", padx=12, pady=(10 if row == 0 else 4, 4))
+            entry.bind("<FocusIn>", lambda _event, widget=entry: active_math_entry.update(widget=widget))
+            math_entries.append(entry)
+
+        if math_entries:
+            active_math_entry["widget"] = math_entries[0]
+
+        math_frame = ttk.Frame(dialog)
+        math_frame.grid(row=len(fields), column=0, columnspan=2, sticky="ew", padx=12, pady=(6, 8))
+        math_frame.columnconfigure(6, weight=1)
+        ttk.Label(math_frame, text=self.txt("math_insert")).grid(row=0, column=0, sticky="w", padx=(0, 8))
+
+        def insert_math(snippet: str, cursor_back: int = 0) -> None:
+            focus = dialog.focus_get()
+            target = focus if focus in math_entries else active_math_entry["widget"]
+            if target is None:
+                return
+            target.insert(tk.INSERT, snippet)
+            if cursor_back:
+                target.icursor(max(0, target.index(tk.INSERT) - cursor_back))
+            target.focus_set()
+            active_math_entry["widget"] = target
+
+        math_buttons = [
+            ("²", "²", 0),
+            ("³", "³", 0),
+            ("⁻¹", "⁻¹", 0),
+            ("⁻²", "⁻²", 0),
+            ("_i", "_i", 0),
+            ("$...$", "$$", 1),
+        ]
+        for column, (label, snippet, cursor_back) in enumerate(math_buttons, start=1):
+            ttk.Button(
+                math_frame,
+                text=label,
+                width=5,
+                command=lambda value=snippet, back=cursor_back: insert_math(value, back),
+            ).grid(row=0, column=column, sticky="w", padx=(0, 4))
 
         color_rows = [
             (self.txt("data_color"), self.data_color),
             (self.txt("fit_color"), self.fit_color),
             (self.txt("grid_color"), self.grid_color),
         ]
-        start_row = len(fields)
+        start_row = len(fields) + 1
         for offset, (label, variable) in enumerate(color_rows):
             row = start_row + offset
             ttk.Label(dialog, text=label).grid(row=row, column=0, sticky="w", padx=12, pady=4)
@@ -1771,7 +1849,7 @@ class UniGraphDesktop(tk.Tk):
         self._select_saved_plot(self.active_plot_index)
         self.figure.clear()
         ax = self.figure.add_subplot(111)
-        ax.set_title(name)
+        ax.set_title(self._render_math_text(name))
         self.canvas.draw()
 
     def _refresh_saved_plots_list(self) -> None:
@@ -1821,6 +1899,9 @@ class UniGraphDesktop(tk.Tk):
             y_label=plot.y_label,
             title=plot.title,
             sheet=plot.sheet,
+            point_label=plot.point_label,
+            curve_label=plot.curve_label,
+            show_smooth_curve=plot.show_smooth_curve,
             parts=plot.parts,
         )
 
@@ -1855,14 +1936,20 @@ class UniGraphDesktop(tk.Tk):
             self.draw_single_saved_plot(saved)
         self.current_plot = saved
         self.plot_title.set(saved.title or saved.name)
+        self.point_label.set(saved.point_label or self.txt("default_point_name"))
+        self.curve_label.set(saved.curve_label or self.txt("default_curve_name"))
+        self.show_smooth_curve.set(saved.show_smooth_curve)
+        if saved.kind in {"scatter", "line", "bar", "hist"}:
+            self.chart_kind.set(saved.kind)
+            self._build_manual_form()
 
     def draw_blank_saved_plot(self, saved: SavedPlot) -> None:
         self.figure.clear()
         ax = self.figure.add_subplot(111)
         self._apply_plot_style(ax)
-        ax.set_title(saved.title or saved.name)
-        ax.set_xlabel(saved.x_label)
-        ax.set_ylabel(saved.y_label)
+        ax.set_title(self._render_math_text(saved.title or saved.name))
+        ax.set_xlabel(self._render_math_text(saved.x_label))
+        ax.set_ylabel(self._render_math_text(saved.y_label))
         self.figure.tight_layout()
         self.canvas.draw()
 
@@ -1873,14 +1960,14 @@ class UniGraphDesktop(tk.Tk):
         self.figure.clear()
         ax = self.figure.add_subplot(111)
         params = self._style_params()
-        self._plot_saved_on_axis(ax, saved, params, self.data_color.get())
+        self._plot_saved_on_axis(ax, saved, params, self.data_color.get(), self.fit_color.get())
         self._apply_plot_style(ax)
-        ax.set_xlabel(saved.x_label)
-        ax.set_ylabel(saved.y_label)
-        ax.set_title(saved.title or saved.name)
+        ax.set_xlabel(self._render_math_text(saved.x_label))
+        ax.set_ylabel(self._render_math_text(saved.y_label))
+        ax.set_title(self._render_math_text(saved.title or saved.name))
         ax.grid(True, color=self.grid_color.get(), alpha=float(params["grid_alpha"]), linestyle=str(params["grid_style"]), linewidth=0.75)
         self._apply_axis_number_format(ax)
-        ax.legend(loc="best")
+        self._show_legend_if_present(ax)
         self.figure.tight_layout()
         self.canvas.draw()
 
@@ -1965,15 +2052,15 @@ class UniGraphDesktop(tk.Tk):
 
         self._apply_plot_style(ax_left)
         ax_right.set_facecolor("none")
-        ax_left.set_xlabel(left_plot.x_label)
-        ax_left.set_ylabel(left_plot.y_label, color=left_color)
+        ax_left.set_xlabel(self._render_math_text(left_plot.x_label))
+        ax_left.set_ylabel(self._render_math_text(left_plot.y_label), color=left_color)
         right_label = right_plots[0].y_label if len(right_plots) == 1 else self.txt("right_y_axis")
-        ax_right.set_ylabel(right_label, color=right_colors[0])
+        ax_right.set_ylabel(self._render_math_text(right_label), color=right_colors[0])
         ax_left.tick_params(axis="y", colors=left_color)
         ax_right.tick_params(axis="y", colors=right_colors[0], labelsize=float(params["font_size"]), width=float(params["spine_width"]))
         ax_left.spines["left"].set_color(left_color)
         ax_right.spines["right"].set_color(right_colors[0])
-        ax_left.set_title(title)
+        ax_left.set_title(self._render_math_text(title))
         ax_left.grid(True, color=self.grid_color.get(), alpha=float(params["grid_alpha"]), linestyle=str(params["grid_style"]), linewidth=0.75)
         self._apply_axis_number_format(ax_left)
         self._apply_axis_number_format(ax_right)
@@ -1983,8 +2070,16 @@ class UniGraphDesktop(tk.Tk):
         self.figure.tight_layout()
         self.canvas.draw()
 
-    def _plot_saved_on_axis(self, ax: object, saved: SavedPlot, params: dict[str, float | str | bool], color: str) -> None:
+    def _plot_saved_on_axis(
+        self,
+        ax: object,
+        saved: SavedPlot,
+        params: dict[str, float | str | bool],
+        color: str,
+        curve_color: str | None = None,
+    ) -> None:
         if saved.kind == "scatter":
+            point_label = self._render_math_text(saved.point_label or saved.name)
             ax.scatter(
                 saved.data["x"],
                 saved.data["y"],
@@ -1992,8 +2087,11 @@ class UniGraphDesktop(tk.Tk):
                 linewidths=float(params["marker_edge_width"]),
                 edgecolors=color,
                 color=color,
-                label=saved.name,
+                label=point_label,
             )
+            if saved.show_smooth_curve:
+                label = self._render_math_text(saved.curve_label or self.txt("default_curve_name"))
+                self._plot_smooth_curve(ax, saved.data, params, curve_color or color, label)
             return
         ax.plot(
             saved.data["x"],
@@ -2003,7 +2101,7 @@ class UniGraphDesktop(tk.Tk):
             markersize=float(params["marker_size"]),
             markeredgewidth=float(params["marker_edge_width"]),
             color=color,
-            label=saved.name,
+            label=self._render_math_text(saved.name),
         )
 
     def analyze_current_xy_data(self) -> None:
@@ -2209,8 +2307,10 @@ class UniGraphDesktop(tk.Tk):
     def _axis_labels(self, kind: str) -> tuple[str, str]:
         x_name = self.x_axis_name.get().strip() or "X"
         y_name = self.y_axis_name.get().strip() or "Y"
-        x_label = x_name + (f" ({self.x_unit.get()})" if self.x_unit.get() else "")
-        y_label = y_name + (f" ({self.y_unit.get()})" if self.y_unit.get() else "")
+        x_unit = self.x_unit.get().strip()
+        y_unit = self.y_unit.get().strip()
+        x_label = self._compose_axis_label(x_name, x_unit)
+        y_label = self._compose_axis_label(y_name, y_unit)
         if kind == "hist":
             return y_label, "Count"
         return x_label, y_label
@@ -2221,7 +2321,49 @@ class UniGraphDesktop(tk.Tk):
     def _apply_title(self, ax: object) -> None:
         title = self._active_title()
         if title:
-            ax.set_title(title)
+            ax.set_title(self._render_math_text(title))
+
+    def _compose_axis_label(self, name: str, unit: str) -> str:
+        label = self._render_math_text(name)
+        if unit:
+            label += f" ({self._render_math_text(unit)})"
+        return label
+
+    def _render_math_text(self, text: str) -> str:
+        value = self._normalize_superscript_text(text.strip())
+        if not value or "$" in value:
+            return value
+
+        token_pattern = re.compile(
+            r"(?<![\\\w])([A-Za-z0-9µμΩ°./%+-]+(?:[\^_](?:\{[^}]+\}|[+-]?\d+(?:\.\d+)?|[A-Za-z]+))+[A-Za-z0-9µμΩ°./%+-]*)"
+        )
+
+        def replace_token(match: re.Match[str]) -> str:
+            token = match.group(1)
+            formatted = re.sub(r"\^([+-]?(?:\d+(?:\.\d+)?|[A-Za-z]+))", r"^{\1}", token)
+            formatted = re.sub(r"_([+-]?(?:\d+(?:\.\d+)?|[A-Za-z]+))", r"_{\1}", formatted)
+            formatted = formatted.replace("µ", r"\mu ").replace("μ", r"\mu ")
+            return f"${formatted}$"
+
+        return token_pattern.sub(replace_token, value)
+
+    def _normalize_superscript_text(self, text: str) -> str:
+        superscripts = str.maketrans(
+            {
+                "⁰": "^0",
+                "¹": "^1",
+                "²": "^2",
+                "³": "^3",
+                "⁴": "^4",
+                "⁵": "^5",
+                "⁶": "^6",
+                "⁷": "^7",
+                "⁸": "^8",
+                "⁹": "^9",
+                "⁻": "^-",
+            }
+        )
+        return text.translate(superscripts)
 
     def _style_params(self) -> dict[str, float | str | bool]:
         if self.plot_style.get() == "presentation":
@@ -2267,6 +2409,96 @@ class UniGraphDesktop(tk.Tk):
             spine.set_color("#111111")
         ax.tick_params(axis="both", labelsize=float(params["font_size"]), width=float(params["spine_width"]))
 
+    def _point_legend_name(self) -> str:
+        return self.point_label.get().strip() or self.txt("default_point_name")
+
+    def _curve_legend_name(self) -> str:
+        return self.curve_label.get().strip() or self.txt("default_curve_name")
+
+    def _show_legend_if_present(self, ax: object) -> None:
+        _handles, labels = ax.get_legend_handles_labels()
+        if labels:
+            ax.legend(loc="best")
+
+    def _plot_smooth_curve(
+        self,
+        ax: object,
+        data: pd.DataFrame,
+        params: dict[str, float | str | bool],
+        color: str,
+        label: str,
+    ) -> None:
+        curve = self._smooth_curve_points(data)
+        if curve is None:
+            return
+        xs, ys = curve
+        ax.plot(
+            xs,
+            ys,
+            color=color,
+            linewidth=float(params["line_width"]) * 1.45,
+            label=self._render_math_text(label),
+        )
+
+    def _smooth_curve_points(self, data: pd.DataFrame) -> tuple[np.ndarray, np.ndarray] | None:
+        frame = data[["x", "y"]].dropna().sort_values("x")
+        if len(frame) < 2:
+            return None
+        grouped = frame.groupby("x", as_index=False, sort=True)["y"].mean()
+        x = grouped["x"].to_numpy(dtype=float)
+        y = grouped["y"].to_numpy(dtype=float)
+        if len(x) < 2 or not np.all(np.isfinite(x)) or not np.all(np.isfinite(y)):
+            return None
+        if len(x) == 2:
+            xs = np.linspace(x[0], x[-1], 80)
+            ys = np.interp(xs, x, y)
+            return xs, ys
+
+        h = np.diff(x)
+        if np.any(h <= 0):
+            return None
+        slopes = np.diff(y) / h
+        derivatives = np.zeros_like(x)
+
+        def endpoint_derivative(h0: float, h1: float, m0: float, m1: float) -> float:
+            value = ((2 * h0 + h1) * m0 - h0 * m1) / (h0 + h1)
+            if np.sign(value) != np.sign(m0):
+                return 0.0
+            if np.sign(m0) != np.sign(m1) and abs(value) > abs(3 * m0):
+                return 3 * m0
+            return value
+
+        derivatives[0] = endpoint_derivative(float(h[0]), float(h[1]), float(slopes[0]), float(slopes[1]))
+        derivatives[-1] = endpoint_derivative(float(h[-1]), float(h[-2]), float(slopes[-1]), float(slopes[-2]))
+        for index in range(1, len(x) - 1):
+            previous = slopes[index - 1]
+            current = slopes[index]
+            if previous == 0 or current == 0 or np.sign(previous) != np.sign(current):
+                derivatives[index] = 0.0
+            else:
+                w1 = 2 * h[index] + h[index - 1]
+                w2 = h[index] + 2 * h[index - 1]
+                derivatives[index] = (w1 + w2) / (w1 / previous + w2 / current)
+
+        sample_count = max(160, min(900, len(x) * 28))
+        xs = np.linspace(x[0], x[-1], sample_count)
+        segment = np.searchsorted(x, xs, side="right") - 1
+        segment = np.clip(segment, 0, len(x) - 2)
+        x0 = x[segment]
+        x1 = x[segment + 1]
+        y0 = y[segment]
+        y1 = y[segment + 1]
+        d0 = derivatives[segment]
+        d1 = derivatives[segment + 1]
+        width = x1 - x0
+        t = (xs - x0) / width
+        h00 = 2 * t**3 - 3 * t**2 + 1
+        h10 = t**3 - 2 * t**2 + t
+        h01 = -2 * t**3 + 3 * t**2
+        h11 = t**3 - t**2
+        ys = h00 * y0 + h10 * width * d0 + h01 * y1 + h11 * width * d1
+        return xs, ys
+
     def _plot_manual(self) -> None:
         data = self._xy_frame()
         if len(data) < 2:
@@ -2310,12 +2542,17 @@ class UniGraphDesktop(tk.Tk):
                 markeredgewidth=float(params["marker_edge_width"]),
                 markeredgecolor=self.data_color.get(),
                 capsize=2.5,
+                label=self._render_math_text(self._point_legend_name()),
             )
+            if self.show_smooth_curve.get():
+                self._plot_smooth_curve(ax, data, params, self.fit_color.get(), self._curve_legend_name())
 
         result_lines: list[str] = []
         self._add_fit(ax, data, result_lines)
         self._add_slope(data, result_lines)
         self._style_axes(ax, kind)
+        if kind == "scatter":
+            self._show_legend_if_present(ax)
         x_label, y_label = self._axis_labels(kind)
         if self._active_title():
             default_name = self._active_title()
@@ -2331,6 +2568,9 @@ class UniGraphDesktop(tk.Tk):
             y_label=y_label,
             title=self._active_title() or default_name,
             sheet=self.sheet.get(),
+            point_label=self._point_legend_name(),
+            curve_label=self._curve_legend_name(),
+            show_smooth_curve=kind == "scatter" and self.show_smooth_curve.get(),
         )
         self._upsert_current_plot()
         self.figure.tight_layout()
